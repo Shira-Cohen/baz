@@ -14,11 +14,13 @@ export interface RenderOptions {
   canonicalUrl: string;
 }
 
+/** Wordmark shown in the header. */
 const SITE_NAME = "BAZ";
+/** Name used in the footer credit ("נבנה על ידי ..."). */
+const STUDIO_NAME = "BAZY";
 const PAGE_TITLE = "BAZ — דברים קטנים שאנחנו בונים";
 const HERO_TITLE = "דברים קטנים שאנחנו בונים";
-const HERO_INTRO = "BAZ הוא בית קטן למוצרים דיגיטליים. כל פעם משהו שימושי אחר.";
-const NAV_PROJECTS = "פרויקטים";
+const HERO_INTRO = "רעיונות קטנים. מוצרים שימושיים.";
 const SECTION_TITLE = "מה בנינו";
 const CARD_CTA = "לכניסה";
 const FOOTER_BUILT_BY = "נבנה על ידי";
@@ -66,7 +68,6 @@ function renderHeader(): string {
   return `<header class="site-header">
 <div class="container header-inner">
 <a class="wordmark" href="/" dir="ltr">${SITE_NAME}</a>
-<nav aria-label="ניווט"><a class="nav-link" href="#projects">${NAV_PROJECTS}</a></nav>
 </div>
 </header>`;
 }
@@ -74,7 +75,7 @@ function renderHeader(): string {
 function renderFooter(year: number): string {
   return `<footer class="site-footer">
 <div class="container footer-inner">
-<span>${FOOTER_BUILT_BY} <span dir="ltr">${SITE_NAME}</span></span>
+<span>${FOOTER_BUILT_BY} <span dir="ltr">${STUDIO_NAME}</span></span>
 <span dir="ltr">© ${String(year)}</span>
 </div>
 </footer>`;
