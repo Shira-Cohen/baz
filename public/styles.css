@@ -287,21 +287,21 @@ a:focus-visible {
   }
 
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
   }
 }
 
 @keyframes pv-pulse {
   0%,
-  70%,
+  60%,
   100% {
     transform: scale(1);
     opacity: 1;
   }
 
-  82% {
-    transform: scale(1.7);
-    opacity: 0.55;
+  78% {
+    transform: scale(2);
+    opacity: 0.5;
   }
 }
 
@@ -312,11 +312,11 @@ a:focus-visible {
   }
 
   50% {
-    transform: scale(1.08);
+    transform: scale(1.12);
   }
 }
 
-/* The gauge needle sweeps along the arc; the arc length follows it (6deg ≈ 7.3px). */
+/* The gauge needle sweeps along the arc; the arc length follows it (10deg ≈ 12.2px). */
 @keyframes pv-orbit {
   0%,
   100% {
@@ -324,7 +324,7 @@ a:focus-visible {
   }
 
   50% {
-    transform: rotate(-6deg);
+    transform: rotate(-10deg);
   }
 }
 
@@ -335,40 +335,40 @@ a:focus-visible {
   }
 
   50% {
-    stroke-dasharray: 129 400;
+    stroke-dasharray: 124.1 400;
   }
 }
 
 .pv-cal-sun {
-  animation: pv-float 6s ease-in-out infinite;
+  animation: pv-float 3.6s ease-in-out infinite;
 }
 
 .pv-cal-dot {
-  animation: pv-pulse 5s ease-in-out infinite;
+  animation: pv-pulse 3.2s ease-in-out infinite;
 }
 
 .pv-cal-dot + .pv-cal-dot {
-  animation-delay: 2.5s;
+  animation-delay: 1.6s;
 }
 
 .pv-rem-avatar-hi {
-  animation: pv-float 5.5s ease-in-out 0.8s infinite;
+  animation: pv-float 3.2s ease-in-out 0.6s infinite;
 }
 
 .pv-rem-chip-hi {
-  animation: pv-breathe 6s ease-in-out infinite;
+  animation: pv-breathe 3s ease-in-out infinite;
 }
 
 .pv-rem-dot {
-  animation: pv-pulse 5s ease-in-out 1.2s infinite;
+  animation: pv-pulse 3.2s ease-in-out 0.8s infinite;
 }
 
 .pv-veh-dot-idle {
-  animation: pv-orbit 7s ease-in-out infinite;
+  animation: pv-orbit 4s ease-in-out infinite;
 }
 
 .pv-veh-value {
-  animation: pv-gauge 7s ease-in-out infinite;
+  animation: pv-gauge 4s ease-in-out infinite;
 }
 
 /* Hover: the card lifts a little and the illustration answers */
