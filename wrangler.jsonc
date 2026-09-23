@@ -25,5 +25,9 @@
     { "pattern": "www.bazy.co.il", "custom_domain": true }
   ],
 
+  // Lets src/previews.ts import the SVG illustrations as strings so they can be
+  // inlined into the HTML, where the page CSS animates the shapes inside them.
+  "rules": [{ "type": "Text", "globs": ["**/*.svg"], "fallthrough": true }],
+
   "observability": { "enabled": true }
 }

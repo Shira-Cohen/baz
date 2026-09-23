@@ -12,12 +12,16 @@ export interface RenderOptions {
   year: number;
   /** Absolute canonical URL of the home page. */
   canonicalUrl: string;
+  /**
+   * Inline SVG markup by project id (see `src/previews.ts`). A project listed
+   * here gets its illustration inlined so the page CSS can animate elements
+   * inside it; any other project falls back to a plain `<img src=image>`.
+   */
+  inlinePreviews?: Readonly<Record<string, string>>;
 }
 
-/** Wordmark shown in the header. */
+/** Wordmark shown in the header and in the footer credit. */
 const SITE_NAME = "BAZ";
-/** Name used in the footer credit ("נבנה על ידי ..."). */
-const STUDIO_NAME = "BAZY";
 const PAGE_TITLE = "BAZ — דברים קטנים שאנחנו בונים";
 const HERO_TITLE = "דברים קטנים שאנחנו בונים";
 const HERO_INTRO = "רעיונות קטנים. מוצרים שימושיים.";
@@ -75,21 +79,41 @@ function renderHeader(): string {
 function renderFooter(year: number): string {
   return `<footer class="site-footer">
 <div class="container footer-inner">
-<span>${FOOTER_BUILT_BY} <span dir="ltr">${STUDIO_NAME}</span></span>
+<span>${FOOTER_BUILT_BY} <span dir="ltr">${SITE_NAME}</span></span>
 <span dir="ltr">© ${String(year)}</span>
 </div>
 </footer>`;
 }
 
-function renderProject(project: Project, index: number): string {
+function renderPreview(
+  project: Project,
+  index: number,
+  inlinePreviews: Readonly<Record<string, string>> | undefined,
+): string {
+  const inline = inlinePreviews?.[project.id];
+  if (inline !== undefined) {
+    // First-party SVG bundled from this repo at deploy time (not config or user
+    // input), inlined verbatim so CSS can reach the shapes inside it.
+    return `<span class="card-preview card-preview-inline" aria-hidden="true">${inline}</span>`;
+  }
   const loading = index < 3 ? "eager" : "lazy";
+  return `<span class="card-preview"><img src="${escapeHtml(project.image)}" width="400" height="300" loading="${loading}" decoding="async" alt=""></span>`;
+}
+
+function renderProject(
+  project: Project,
+  index: number,
+  inlinePreviews: Readonly<Record<string, string>> | undefined,
+): string {
   return `<li class="project">
 <a class="card" href="${escapeHtml(project.url)}">
-<span class="card-preview"><img src="${escapeHtml(project.image)}" width="400" height="300" loading="${loading}" decoding="async" alt=""></span>
+${renderPreview(project, index, inlinePreviews)}
+<div class="card-body">
 <span class="card-meta"><span class="card-number" dir="ltr">${twoDigits(index + 1)}</span><span class="card-sep" aria-hidden="true">·</span><span class="card-category" dir="ltr">${escapeHtml(project.category)}</span></span>
 <h3 class="card-title">${escapeHtml(project.name)}</h3>
 <p class="card-description">${escapeHtml(project.description)}</p>
 <span class="card-cta"><span>${CARD_CTA}</span><span class="card-cta-arrow" aria-hidden="true">←</span></span>
+</div>
 </a>
 </li>`;
 }
@@ -108,7 +132,9 @@ ${body}
 export function renderHome(projects: readonly Project[], options: RenderOptions): string {
   const names = projects.map((p) => p.name).join(", ");
   const description = `${SITE_NAME} הוא בית קטן למוצרים דיגיטליים: ${names}.`;
-  const items = projects.map(renderProject).join("\n");
+  const items = projects
+    .map((project, index) => renderProject(project, index, options.inlinePreviews))
+    .join("\n");
 
   const body = `${renderHeader()}
 <main>

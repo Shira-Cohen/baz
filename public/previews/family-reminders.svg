@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-  <rect width="400" height="300" fill="#f7f0ea"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" class="pv pv-rem" aria-hidden="true" focusable="false">
+  <rect width="400" height="300" fill="#f8ede5"/>
   <rect x="60" y="34" width="280" height="300" rx="6" fill="#ffffff" stroke="#e9ddd4"/>
   <rect x="200" y="54" width="112" height="9" rx="4.5" fill="#3b2f2a"/>
   <rect x="248" y="72" width="64" height="5" rx="2.5" fill="#e4d8ce"/>
@@ -9,12 +9,12 @@
     <rect x="214" y="118" width="60" height="5" rx="2.5" fill="#ebe2da"/>
     <rect x="78" y="103" width="46" height="18" rx="9" fill="#f2e8e0"/>
   </g>
-  <g>
-    <rect x="60" y="140" width="280" height="50" fill="#fbf4ef"/>
-    <circle cx="296" cy="165" r="14" fill="#d9a08a"/>
+  <rect x="60" y="140" width="280" height="50" fill="#fbf4ef"/>
+  <g class="pv-rem-row-hi">
+    <circle class="pv-rem-avatar-hi" cx="296" cy="165" r="14" fill="#d9a08a"/>
     <rect x="166" y="157" width="108" height="8" rx="4" fill="#3b2f2a"/>
     <rect x="214" y="171" width="60" height="5" rx="2.5" fill="#d9cdc3"/>
-    <rect x="78" y="156" width="46" height="18" rx="9" fill="#c4663d"/>
+    <rect class="pv-rem-chip-hi" x="78" y="156" width="46" height="18" rx="9" fill="#c4663d"/>
   </g>
   <g>
     <circle cx="296" cy="218" r="14" fill="#e6d3c7"/>

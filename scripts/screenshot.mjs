@@ -201,7 +201,8 @@ try {
       expression: "document.fonts.ready.then(() => document.fonts.status)",
       awaitPromise: true,
     });
-    await sleep(300);
+    // Let the entrance animations (≈1.1s) finish before capturing.
+    await sleep(1400);
 
     const { cssContentSize } = await page("Page.getLayoutMetrics");
     const clip = {
@@ -215,6 +216,18 @@ try {
     const file = join(outDir, `${vp.name}.png`);
     writeFileSync(file, Buffer.from(data, "base64"));
     console.log(`saved ${file} (${clip.width}x${clip.height} css px)`);
+
+    // Viewport-only shot after scrolling to the bottom: shows scroll-driven
+    // reveals in their final state and the footer as a visitor sees it.
+    await page("Runtime.evaluate", {
+      expression: "window.scrollTo(0, document.documentElement.scrollHeight)",
+    });
+    await sleep(600);
+    const bottom = await page("Page.captureScreenshot", { format: "png" });
+    const bottomFile = join(outDir, `${vp.name}-bottom.png`);
+    writeFileSync(bottomFile, Buffer.from(bottom.data, "base64"));
+    console.log(`saved ${bottomFile} (viewport after scrolling to bottom)`);
+    await page("Runtime.evaluate", { expression: "window.scrollTo(0, 0)" });
   }
 
   try {

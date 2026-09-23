@@ -11,6 +11,8 @@
   --container: 1120px;
   --pad: clamp(20px, 5vw, 48px);
   --ease: 150ms ease;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --move: 380ms var(--ease-out);
 }
 
 *,
@@ -81,13 +83,13 @@ a:focus-visible {
 
 /* Hero */
 .hero {
-  padding-block: clamp(48px, 9vh, 112px) clamp(40px, 6vh, 80px);
+  padding-block: clamp(44px, 8vh, 96px) clamp(32px, 5vh, 64px);
 }
 
 .hero-title {
   margin: 0;
   max-width: 18ch;
-  font-size: clamp(2rem, 4.6vw, 3.5rem);
+  font-size: clamp(1.9rem, 4.2vw, 3.2rem);
   font-weight: 300;
   line-height: 1.15;
   text-wrap: balance;
@@ -98,10 +100,10 @@ a:focus-visible {
 }
 
 .hero-intro {
-  margin: 20px 0 0;
+  margin: 16px 0 0;
   max-width: 44ch;
   color: var(--muted);
-  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  font-size: clamp(1rem, 1.25vw, 1.1rem);
   text-wrap: pretty;
 }
 
@@ -114,21 +116,32 @@ a:focus-visible {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding-block: 20px;
+  padding-top: 18px;
   margin-bottom: 36px;
   border-top: 1px solid var(--line);
 }
 
 .section-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   margin: 0;
   font-size: 0.95rem;
   font-weight: 500;
   color: var(--muted);
 }
 
+.section-title::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
 .section-count {
   color: var(--muted);
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   font-weight: 300;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -140,7 +153,7 @@ a:focus-visible {
   padding: 0;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 48px 32px;
+  gap: 52px 32px;
 }
 
 @media (min-width: 640px) {
@@ -156,34 +169,51 @@ a:focus-visible {
   }
 }
 
+/* Card: one link, one unit */
 .card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  transition: transform var(--move);
 }
 
 .card-preview {
   display: block;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--surface);
-  transition: border-color var(--ease);
+  transition: box-shadow var(--move);
 }
 
-.card-preview img {
+.card-preview:not(.card-preview-inline) {
+  border: 1px solid var(--line);
+}
+
+.card-preview img,
+.card-preview svg {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+.card-preview svg {
+  transition: transform var(--move);
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
 .card-meta {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-top: 14px;
   color: var(--faint);
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
@@ -195,7 +225,7 @@ a:focus-visible {
 }
 
 .card-title {
-  margin: 0;
+  margin: 2px 0 0;
   font-size: 1.4rem;
   font-weight: 500;
   line-height: 1.3;
@@ -212,7 +242,7 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 6px;
+  margin-top: 8px;
   color: var(--accent);
   font-size: 0.95rem;
   font-weight: 500;
@@ -220,12 +250,90 @@ a:focus-visible {
 
 .card-cta-arrow {
   display: inline-block;
-  transition: transform var(--ease);
+  transition: transform var(--move);
 }
 
+/* Illustrations: parts that move (see public/previews/*.svg) */
+.pv-cal-photo,
+.pv-cal-today,
+.pv-cal-dot,
+.pv-rem-row-hi,
+.pv-rem-chip-hi,
+.pv-veh-dot,
+.pv-veh-seg-accent {
+  transition: transform var(--move);
+}
+
+.pv-veh-value {
+  transition: stroke-dasharray var(--move);
+}
+
+.pv-cal-dot,
+.pv-rem-chip-hi {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pv-veh-seg-accent {
+  transform-box: fill-box;
+  transform-origin: left center;
+}
+
+.pv-veh-dot,
+.pv-veh-dot-idle {
+  transform-box: view-box;
+  transform-origin: 200px 130px;
+}
+
+/* Idle: one element per illustration drifts once every few seconds */
+@keyframes pv-float {
+  0%,
+  78%,
+  100% {
+    transform: translateY(0);
+  }
+
+  89% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes pv-orbit {
+  0%,
+  78%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  89% {
+    transform: rotate(-2.5deg);
+  }
+}
+
+.pv-cal-sun {
+  animation: pv-float 9s ease-in-out 1s infinite;
+}
+
+.pv-rem-avatar-hi {
+  animation: pv-float 7s ease-in-out 2.5s infinite;
+}
+
+.pv-veh-dot-idle {
+  animation: pv-orbit 8s ease-in-out 4s infinite;
+}
+
+/* Hover: the card lifts a little and the illustration answers */
 @media (hover: hover) {
+  .card:hover {
+    transform: translateY(-3px);
+  }
+
   .card:hover .card-preview {
-    border-color: var(--accent);
+    box-shadow: 0 14px 32px -20px rgba(20, 20, 20, 0.35);
+  }
+
+  .card:hover .card-preview svg {
+    transform: translateY(-2px) scale(1.02);
   }
 
   .card:hover .card-title {
@@ -235,6 +343,125 @@ a:focus-visible {
   .card:hover .card-cta-arrow,
   .card-cta:hover .card-cta-arrow {
     transform: translateX(-4px);
+  }
+
+  .card:hover .pv-cal-photo,
+  .card:hover .pv-cal-today {
+    transform: translateY(-3px);
+  }
+
+  .card:hover .pv-cal-dot {
+    transform: scale(1.5);
+  }
+
+  .card:hover .pv-rem-row-hi {
+    transform: translateX(-4px);
+  }
+
+  .card:hover .pv-rem-chip-hi {
+    transform: scale(1.08);
+  }
+
+  .card:hover .pv-veh-dot {
+    transform: rotate(5deg);
+  }
+
+  .card:hover .pv-veh-value {
+    stroke-dasharray: 143.6 400;
+  }
+
+  .card:hover .pv-veh-seg-accent {
+    transform: scaleX(1.14);
+  }
+}
+
+/* Page entrance: title, then the line under it, then the dot */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.hero-title {
+  animation: rise 700ms var(--ease-out) both;
+}
+
+.hero-title .accent {
+  animation: fade 450ms ease-out 620ms both;
+}
+
+.hero-intro {
+  animation: rise 700ms var(--ease-out) 160ms both;
+}
+
+.projects {
+  animation: fade 800ms ease-out 300ms both;
+}
+
+/* Scroll: cards reveal as they enter, the hero drifts as it leaves */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-drift {
+  to {
+    opacity: 0.7;
+    transform: translateY(-12px);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .hero {
+    animation: hero-drift linear both;
+    animation-timeline: view();
+    animation-range: exit 0% exit 100%;
+  }
+
+  .section-head,
+  .project {
+    animation: reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 45%;
+  }
+
+  @media (min-width: 640px) and (max-width: 1199px) {
+    .project:nth-child(2n) {
+      animation-range: entry 8% entry 53%;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .project:nth-child(3n + 2) {
+      animation-range: entry 8% entry 53%;
+    }
+
+    .project:nth-child(3n) {
+      animation-range: entry 16% entry 61%;
+    }
   }
 }
 
@@ -278,7 +505,7 @@ a:focus-visible {
   }
 
   .hero {
-    padding-block: 48px 36px;
+    padding-block: 44px 32px;
   }
 
   .card-title {
@@ -286,7 +513,7 @@ a:focus-visible {
   }
 }
 
-/* Motion */
+/* Motion off when the visitor asked for it */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -296,5 +523,6 @@ a:focus-visible {
   *::before,
   *::after {
     transition: none !important;
+    animation: none !important;
   }
 }

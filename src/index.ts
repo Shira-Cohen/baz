@@ -6,6 +6,7 @@
  * file lands here: `/` is rendered from `src/projects.ts`, `www.` redirects to
  * the apex, everything else is a small 404 page.
  */
+import { inlinePreviews } from "./previews.ts";
 import { projects } from "./projects.ts";
 import { renderHome, renderNotFound } from "./render.ts";
 
@@ -48,7 +49,11 @@ export default {
       });
     }
 
-    const options = { year: new Date().getFullYear(), canonicalUrl: `${CANONICAL_ORIGIN}/` };
+    const options = {
+      year: new Date().getFullYear(),
+      canonicalUrl: `${CANONICAL_ORIGIN}/`,
+      inlinePreviews,
+    };
 
     if (url.pathname === "/") {
       return htmlResponse(renderHome(projects, options), request, 200, "public, max-age=300");

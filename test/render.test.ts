@@ -75,6 +75,16 @@ test("project fields are escaped in the output", () => {
   assert.ok(html.includes('href="https://example.com/?a=1&amp;b=2"'));
 });
 
+test("inline SVG previews replace the <img> only for registered projects", () => {
+  const [first, second] = projects;
+  assert.ok(first && second, "needs at least two projects");
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect class="pv-test"/></svg>';
+  const html = renderHome(projects, { ...options, inlinePreviews: { [first.id]: svg } });
+  assert.ok(html.includes(`<span class="card-preview card-preview-inline" aria-hidden="true">${svg}</span>`));
+  assert.ok(!html.includes(`<img src="${first.image}"`), "registered project must not also render an <img>");
+  assert.ok(html.includes(`<img src="${second.image}"`), "unregistered project keeps the <img> fallback");
+});
+
 test("404 page links back home", () => {
   const html = renderNotFound(options);
   assert.ok(html.includes("404"));
