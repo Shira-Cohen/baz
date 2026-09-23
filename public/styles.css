@@ -256,16 +256,10 @@ a:focus-visible {
 /* Illustrations: parts that move (see public/previews/*.svg) */
 .pv-cal-photo,
 .pv-cal-today,
-.pv-cal-dot,
 .pv-rem-row-hi,
-.pv-rem-chip-hi,
-.pv-veh-dot,
+.pv-veh-result,
 .pv-veh-seg-accent {
   transition: transform var(--move);
-}
-
-.pv-veh-value {
-  transition: stroke-dasharray var(--move);
 }
 
 .pv-cal-dot,
@@ -279,47 +273,97 @@ a:focus-visible {
   transform-origin: left center;
 }
 
-.pv-veh-dot,
 .pv-veh-dot-idle {
   transform-box: view-box;
   transform-origin: 200px 130px;
 }
 
-/* Idle: one element per illustration drifts once every few seconds */
+/* Idle: each illustration keeps one or two small parts slowly alive */
 @keyframes pv-float {
   0%,
-  78%,
   100% {
     transform: translateY(0);
   }
 
-  89% {
-    transform: translateY(-2px);
+  50% {
+    transform: translateY(-4px);
   }
 }
 
+@keyframes pv-pulse {
+  0%,
+  70%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  82% {
+    transform: scale(1.7);
+    opacity: 0.55;
+  }
+}
+
+@keyframes pv-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+/* The gauge dot rides along the arc; the arc length follows it (4deg ≈ 4.9px). */
 @keyframes pv-orbit {
   0%,
-  78%,
   100% {
     transform: rotate(0deg);
   }
 
-  89% {
-    transform: rotate(-2.5deg);
+  50% {
+    transform: rotate(-4deg);
+  }
+}
+
+@keyframes pv-gauge {
+  0%,
+  100% {
+    stroke-dasharray: 136.3 400;
+  }
+
+  50% {
+    stroke-dasharray: 131.4 400;
   }
 }
 
 .pv-cal-sun {
-  animation: pv-float 9s ease-in-out 1s infinite;
+  animation: pv-float 6s ease-in-out infinite;
+}
+
+.pv-cal-dot {
+  animation: pv-pulse 5s ease-in-out infinite;
+}
+
+.pv-cal-dot + .pv-cal-dot {
+  animation-delay: 2.5s;
 }
 
 .pv-rem-avatar-hi {
-  animation: pv-float 7s ease-in-out 2.5s infinite;
+  animation: pv-float 5.5s ease-in-out 0.8s infinite;
+}
+
+.pv-rem-chip-hi {
+  animation: pv-breathe 6s ease-in-out infinite;
 }
 
 .pv-veh-dot-idle {
-  animation: pv-orbit 8s ease-in-out 4s infinite;
+  animation: pv-orbit 7s ease-in-out infinite;
+}
+
+.pv-veh-value {
+  animation: pv-gauge 7s ease-in-out infinite;
 }
 
 /* Hover: the card lifts a little and the illustration answers */
@@ -350,24 +394,12 @@ a:focus-visible {
     transform: translateY(-3px);
   }
 
-  .card:hover .pv-cal-dot {
-    transform: scale(1.5);
-  }
-
   .card:hover .pv-rem-row-hi {
     transform: translateX(-4px);
   }
 
-  .card:hover .pv-rem-chip-hi {
-    transform: scale(1.08);
-  }
-
-  .card:hover .pv-veh-dot {
-    transform: rotate(5deg);
-  }
-
-  .card:hover .pv-veh-value {
-    stroke-dasharray: 143.6 400;
+  .card:hover .pv-veh-result {
+    transform: translateY(-2px);
   }
 
   .card:hover .pv-veh-seg-accent {

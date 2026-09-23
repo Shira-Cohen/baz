@@ -29,5 +29,10 @@
   // inlined into the HTML, where the page CSS animates the shapes inside them.
   "rules": [{ "type": "Text", "globs": ["**/*.svg"], "fallthrough": true }],
 
+  // Exposes the deployment's version id to the Worker. It is appended to the
+  // stylesheet URL (/styles.css?v=...) so browsers fetch fresh CSS after every
+  // deploy instead of serving a cached copy for up to an hour.
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
+
   "observability": { "enabled": true }
 }

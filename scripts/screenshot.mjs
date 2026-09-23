@@ -217,6 +217,26 @@ try {
     writeFileSync(file, Buffer.from(data, "base64"));
     console.log(`saved ${file} (${clip.width}x${clip.height} css px)`);
 
+    if (vp === VIEWPORTS[0]) {
+      // Idle-motion probe: the computed transform of an animated illustration
+      // part must change over time, otherwise the CSS animations are not running.
+      const probe = await page("Runtime.evaluate", {
+        expression: `(async () => {
+          const el = document.querySelector(".pv-cal-sun");
+          if (!el) return "no .pv-cal-sun element";
+          const before = getComputedStyle(el).transform;
+          await new Promise((r) => setTimeout(r, 1500));
+          const after = getComputedStyle(el).transform;
+          return before === after ? "STATIC " + before : "moving: " + before + " -> " + after;
+        })()`,
+        awaitPromise: true,
+        returnByValue: true,
+      });
+      const result = String(probe.result?.value ?? "");
+      console.log(`idle motion probe: ${result}`);
+      if (result.startsWith("STATIC") || result.startsWith("no ")) note("motion", result);
+    }
+
     // Viewport-only shot after scrolling to the bottom: shows scroll-driven
     // reveals in their final state and the footer as a visitor sees it.
     await page("Runtime.evaluate", {

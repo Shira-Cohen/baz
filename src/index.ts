@@ -35,7 +35,7 @@ function htmlResponse(html: string, request: Request, status: number, cacheContr
 }
 
 export default {
-  async fetch(request): Promise<Response> {
+  async fetch(request, env): Promise<Response> {
     const url = new URL(request.url);
 
     if (REDIRECT_HOSTS.has(url.hostname)) {
@@ -49,14 +49,19 @@ export default {
       });
     }
 
+    // First 8 chars of the deployment version id; changes on every deploy.
+    const versionId = env.CF_VERSION_METADATA?.id;
     const options = {
       year: new Date().getFullYear(),
       canonicalUrl: `${CANONICAL_ORIGIN}/`,
       inlinePreviews,
+      assetVersion: versionId ? versionId.slice(0, 8) : undefined,
     };
 
     if (url.pathname === "/") {
-      return htmlResponse(renderHome(projects, options), request, 200, "public, max-age=300");
+      // Short HTML cache so a deploy is visible within a minute; the versioned
+      // stylesheet URL keeps HTML and CSS consistent with each other.
+      return htmlResponse(renderHome(projects, options), request, 200, "public, max-age=60");
     }
 
     return htmlResponse(renderNotFound(options), request, 404, "public, max-age=60");

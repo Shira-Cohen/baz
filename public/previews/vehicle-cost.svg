@@ -6,7 +6,7 @@
   <g class="pv-veh-dot-idle">
     <circle class="pv-veh-dot" cx="225.8" cy="64.9" r="5" fill="#c4663d"/>
   </g>
-  <rect x="150" y="150" width="100" height="12" rx="6" fill="#1f3a38"/>
+  <rect class="pv-veh-result" x="150" y="150" width="100" height="12" rx="6" fill="#1f3a38"/>
   <rect x="172" y="170" width="56" height="5" rx="2.5" fill="#d5ddd8"/>
   <g>
     <rect x="84" y="196" width="92" height="14" rx="4" fill="#2f6f6a"/>

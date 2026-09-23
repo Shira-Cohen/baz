@@ -85,6 +85,14 @@ test("inline SVG previews replace the <img> only for registered projects", () =>
   assert.ok(html.includes(`<img src="${second.image}"`), "unregistered project keeps the <img> fallback");
 });
 
+test("stylesheet URL carries the deployment version when one is known", () => {
+  const plain = renderHome(projects, options);
+  assert.ok(plain.includes('<link rel="stylesheet" href="/styles.css">'));
+  const versioned = renderHome(projects, { ...options, assetVersion: "4e33d9e1" });
+  assert.ok(versioned.includes('<link rel="stylesheet" href="/styles.css?v=4e33d9e1">'));
+  assert.ok(renderNotFound({ ...options, assetVersion: "4e33d9e1" }).includes("/styles.css?v=4e33d9e1"));
+});
+
 test("404 page links back home", () => {
   const html = renderNotFound(options);
   assert.ok(html.includes("404"));

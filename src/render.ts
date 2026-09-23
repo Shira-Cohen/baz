@@ -18,6 +18,11 @@ export interface RenderOptions {
    * inside it; any other project falls back to a plain `<img src=image>`.
    */
   inlinePreviews?: Readonly<Record<string, string>>;
+  /**
+   * Short identifier of the current deployment, appended to the stylesheet URL
+   * as a cache-buster so a new deploy never pairs new HTML with stale CSS.
+   */
+  assetVersion?: string;
 }
 
 /** Wordmark shown in the header and in the footer credit. */
@@ -46,7 +51,16 @@ function twoDigits(n: number): string {
   return String(n).padStart(2, "0");
 }
 
-function renderHead(title: string, description: string, canonicalUrl: string): string {
+function stylesheetHref(assetVersion: string | undefined): string {
+  return assetVersion ? `/styles.css?v=${encodeURIComponent(assetVersion)}` : "/styles.css";
+}
+
+function renderHead(
+  title: string,
+  description: string,
+  canonicalUrl: string,
+  assetVersion: string | undefined,
+): string {
   return `<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -64,7 +78,7 @@ function renderHead(title: string, description: string, canonicalUrl: string): s
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="${FONT_CSS_URL}">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="${escapeHtml(stylesheetHref(assetVersion))}">
 </head>`;
 }
 
@@ -154,7 +168,10 @@ ${items}
 </main>
 ${renderFooter(options.year)}`;
 
-  return renderDocument(renderHead(PAGE_TITLE, description, options.canonicalUrl), body);
+  return renderDocument(
+    renderHead(PAGE_TITLE, description, options.canonicalUrl, options.assetVersion),
+    body,
+  );
 }
 
 export function renderNotFound(options: RenderOptions): string {
@@ -166,5 +183,8 @@ export function renderNotFound(options: RenderOptions): string {
 </main>
 ${renderFooter(options.year)}`;
 
-  return renderDocument(renderHead(`404 — ${SITE_NAME}`, NOT_FOUND_TITLE, options.canonicalUrl), body);
+  return renderDocument(
+    renderHead(`404 — ${SITE_NAME}`, NOT_FOUND_TITLE, options.canonicalUrl, options.assetVersion),
+    body,
+  );
 }
