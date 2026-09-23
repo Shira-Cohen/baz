@@ -197,7 +197,7 @@ export function renderMotionCheck(options: RenderOptions): string {
 <p class="mc-lead">עמוד עזר: מראה אם הדפדפן במכשיר הזה מריץ את האנימציות של האתר, ואם לא, למה.</p>
 <dl class="mc-list">
 <div class="mc-row"><dt>אנימציות CSS</dt><dd><span class="mc-track" aria-hidden="true"><span class="mc-dot"></span></span><span class="mc-note">אם הנקודה נעה מצד לצד, אנימציות עובדות כאן.</span></dd></div>
-<div class="mc-row"><dt>הפחתת תנועה במכשיר</dt><dd><span class="mc-rm-on">פעילה. המכשיר מבקש מאתרים לא להזיז דברים, והאתר מכבד את זה ולא מציג תנועה. אפשר לשנות בהגדרות הנגישות של המכשיר (ב-Windows: אפקטי אנימציה; ב-iPhone: Reduce Motion).</span><span class="mc-rm-off">לא פעילה.</span></dd></div>
+<div class="mc-row"><dt>הפחתת תנועה במכשיר</dt><dd><span class="mc-rm-on">פעילה. המכשיר מבקש מאתרים להפחית תנועה. האתר משאיר את התנועה הקטנה (איורים, hover, כניסה) ומבטל רק תנועה שקשורה לגלילה: הכרטיסים מופיעים בלי לעלות והכותרת לא נסחפת. אפשר לשנות בהגדרות הנגישות של המכשיר (ב-Windows: אפקטי אנימציה; ב-iPhone: Reduce Motion).</span><span class="mc-rm-off">לא פעילה.</span></dd></div>
 <div class="mc-row"><dt>אנימציות גלילה</dt><dd><span class="mc-sda-yes">נתמכות בדפדפן הזה.</span><span class="mc-sda-no">לא נתמכות בדפדפן הזה, ולכן הכרטיסים מוצגים בלי אפקט הגילוי בגלילה.</span></dd></div>
 <div class="mc-row"><dt>עכבר (hover)</dt><dd><span class="mc-hover-yes">יש. <span class="mc-box" aria-hidden="true"></span> העבירו את העכבר על הריבוע: הוא צריך לעלות ולהיצבע.</span><span class="mc-hover-no">אין (מסך מגע). תגובות hover לא רלוונטיות במכשיר הזה.</span></dd></div>
 <div class="mc-row"><dt>גרסת הדף</dt><dd dir="ltr">${escapeHtml(version)}</dd></div>

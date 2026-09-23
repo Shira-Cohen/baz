@@ -550,29 +550,33 @@ a:focus-visible {
   }
 }
 
-/* Reduced motion: nothing moves (no loops, entrance, reveal, lift or drift),
-   while colour and shadow changes keep their soft transitions. */
+/* Reduced motion (the device's accessibility setting): like most sites, the
+   small stuff stays (hover, the tiny idle drift inside the illustrations, a
+   soft entrance). Only scroll-linked movement is removed: the hero no longer
+   drifts and the cards simply fade in instead of rising. */
+@keyframes fade-only {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
+  .hero {
+    animation: none;
   }
 
-  .card,
-  .card-preview svg,
-  .card-cta-arrow,
-  .pv-cal-photo,
-  .pv-cal-today,
-  .pv-rem-row-hi,
-  .pv-veh-result,
-  .pv-veh-seg-accent,
-  .mc-box {
-    transition: color var(--ease), background var(--ease), box-shadow var(--ease);
-    transform: none !important;
+  .hero-title,
+  .hero-intro,
+  .section-head,
+  .project {
+    animation-name: fade-only;
   }
 }

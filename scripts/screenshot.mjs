@@ -187,6 +187,15 @@ try {
 
   await Promise.all([page("Page.enable"), page("Runtime.enable"), page("Log.enable"), page("Network.enable")]);
 
+  // REDUCED_MOTION=1 emulates a device with the "reduce motion" accessibility
+  // setting, to check what such visitors get.
+  if (process.env.REDUCED_MOTION === "1") {
+    await page("Emulation.setEmulatedMedia", {
+      features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+    });
+    console.log("emulating prefers-reduced-motion: reduce");
+  }
+
   for (const vp of VIEWPORTS) {
     await page("Emulation.setDeviceMetricsOverride", {
       width: vp.width,
