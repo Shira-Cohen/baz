@@ -1,0 +1,22 @@
+{
+  "name": "baz",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "BAZ homepage - a small home for small digital products, served by a Cloudflare Worker.",
+  "engines": {
+    "node": ">=23.6"
+  },
+  "scripts": {
+    "dev": "wrangler dev --ip 127.0.0.1 --port 8787",
+    "deploy": "wrangler deploy",
+    "types": "wrangler types",
+    "check": "wrangler types && tsc --noEmit",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "screenshot": "node scripts/screenshot.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "wrangler": "^4.137.0"
+  }
+}

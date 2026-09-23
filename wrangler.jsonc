@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "baz",
+  "main": "src/index.ts",
+  // Must not be newer than the workerd build bundled with the installed wrangler
+  // (node_modules/workerd/package.json → 1.YYYYMMDD.x), or `wrangler dev` refuses to start.
+  "compatibility_date": "2026-09-21",
+
+  // Everything in public/ is served as a static file before the Worker runs.
+  // There is deliberately no public/index.html: `/` falls through to src/index.ts,
+  // which renders the page from src/projects.ts.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "not_found_handling": "none"
+  },
+
+  // workers.dev stays enabled as a fallback URL (wrangler turns it off by default
+  // once routes exist); the custom domains below are the canonical hosts.
+  // The Worker 301-redirects www → apex.
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "bazy.co.il", "custom_domain": true },
+    { "pattern": "www.bazy.co.il", "custom_domain": true }
+  ],
+
+  "observability": { "enabled": true }
+}
