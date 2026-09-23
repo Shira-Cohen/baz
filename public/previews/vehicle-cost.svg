@@ -4,10 +4,16 @@
   <path d="M130 130A70 70 0 0 1 270 130" fill="none" stroke="#e1e7e3" stroke-width="14" stroke-linecap="round"/>
   <path class="pv-veh-value" d="M130 130A70 70 0 0 1 270 130" fill="none" stroke="#2f6f6a" stroke-width="14" stroke-linecap="round" stroke-dasharray="136.3 400"/>
   <g class="pv-veh-dot-idle">
-    <circle class="pv-veh-dot" cx="225.8" cy="64.9" r="5" fill="#c4663d"/>
+    <line x1="200" y1="130" x2="221.4" y2="76.1" stroke="#1f3a38" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="225.8" cy="64.9" r="5" fill="#c4663d"/>
   </g>
-  <rect class="pv-veh-result" x="150" y="150" width="100" height="12" rx="6" fill="#1f3a38"/>
-  <rect x="172" y="170" width="56" height="5" rx="2.5" fill="#d5ddd8"/>
+  <circle cx="200" cy="130" r="4.5" fill="#1f3a38"/>
+  <g class="pv-veh-result" fill="#1f3a38">
+    <path d="M174 166v-7a5 5 0 0 1 5-5h9l7-9h14l9 9h3a5 5 0 0 1 5 5v7z"/>
+    <circle cx="186" cy="166" r="4.5"/>
+    <circle cx="214" cy="166" r="4.5"/>
+  </g>
+  <rect x="180" y="177" width="40" height="4" rx="2" fill="#d5ddd8"/>
   <g>
     <rect x="84" y="196" width="92" height="14" rx="4" fill="#2f6f6a"/>
     <rect x="180" y="196" width="60" height="14" rx="4" fill="#6fa39e"/>

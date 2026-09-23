@@ -9,7 +9,15 @@
   <g class="pv-cal-photo">
     <rect x="88" y="46" width="224" height="98" rx="4" fill="#c7d6e2"/>
     <circle class="pv-cal-sun" cx="272" cy="78" r="13" fill="#f6ece0"/>
-    <path d="M88 144V124l52-32 46 30 38-20 88 40v2z" fill="#9db4c6"/>
+    <path d="M88 144v-18l60-30 44 22 40-16 80 34v8z" fill="#9db4c6"/>
+    <g fill="#5f7d95">
+      <circle cx="168" cy="96" r="9"/>
+      <path d="M152 144v-18a16 16 0 0 1 32 0v18z"/>
+      <circle cx="199" cy="112" r="6.5"/>
+      <path d="M188 144v-11a11 11 0 0 1 22 0v11z"/>
+      <circle cx="230" cy="94" r="9"/>
+      <path d="M214 144v-18a16 16 0 0 1 32 0v18z"/>
+    </g>
   </g>
   <rect x="160" y="158" width="80" height="8" rx="4" fill="#4f6f8c"/>
   <g fill="#c9d3db">
@@ -24,6 +32,9 @@
   <rect x="88" y="186" width="224" height="140" fill="url(#pv-cal-grid)"/>
   <rect class="pv-cal-today" x="187" y="214" width="26" height="22" rx="3" fill="#4f6f8c"/>
   <rect x="253" y="242" width="26" height="22" rx="3" fill="#dbe5ec"/>
+  <rect x="258" y="200" width="16" height="3" rx="1.5" fill="#9db4c6"/>
+  <rect x="258" y="256" width="16" height="3" rx="1.5" fill="#4f6f8c"/>
+  <rect x="126" y="284" width="16" height="3" rx="1.5" fill="#9db4c6"/>
   <circle class="pv-cal-dot" cx="134" cy="253" r="3" fill="#c4663d"/>
   <circle class="pv-cal-dot" cx="299" cy="197" r="3" fill="#c4663d"/>
 </svg>

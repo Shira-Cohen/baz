@@ -263,7 +263,8 @@ a:focus-visible {
 }
 
 .pv-cal-dot,
-.pv-rem-chip-hi {
+.pv-rem-chip-hi,
+.pv-rem-dot {
   transform-box: fill-box;
   transform-origin: center;
 }
@@ -356,6 +357,10 @@ a:focus-visible {
 
 .pv-rem-chip-hi {
   animation: pv-breathe 6s ease-in-out infinite;
+}
+
+.pv-rem-dot {
+  animation: pv-pulse 5s ease-in-out 1.2s infinite;
 }
 
 .pv-veh-dot-idle {
