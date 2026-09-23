@@ -1,0 +1,136 @@
+/* /motion — CSS-only self-check page (see renderMotionCheck in src/render.ts) */
+.motion-check {
+  max-width: 760px;
+  padding-block: clamp(48px, 10vh, 120px);
+}
+
+.mc-lead {
+  margin: 0 0 32px;
+  color: var(--muted);
+}
+
+.mc-list {
+  display: grid;
+  gap: 20px;
+  margin: 0 0 40px;
+}
+
+.mc-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.mc-row dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.mc-row dd {
+  margin: 0;
+}
+
+.mc-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Test 1: a plainly visible CSS animation */
+.mc-track {
+  position: relative;
+  display: inline-block;
+  width: 160px;
+  height: 24px;
+  margin-inline-end: 12px;
+  border-radius: 12px;
+  background: var(--line);
+  vertical-align: middle;
+}
+
+.mc-dot {
+  position: absolute;
+  top: 4px;
+  inset-inline-start: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: mc-slide 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes mc-slide {
+  to {
+    transform: translateX(-136px);
+  }
+}
+
+/* Test 2: reduced-motion preference */
+.mc-rm-on {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-rm-on {
+    display: inline;
+  }
+
+  .mc-rm-off {
+    display: none;
+  }
+}
+
+/* Test 3: scroll-driven animation support */
+.mc-sda-no {
+  display: none;
+}
+
+@supports not (animation-timeline: view()) {
+  .mc-sda-yes {
+    display: none;
+  }
+
+  .mc-sda-no {
+    display: inline;
+  }
+}
+
+/* Test 4: hover capability */
+.mc-hover-no {
+  display: none;
+}
+
+@media (hover: none) {
+  .mc-hover-yes {
+    display: none;
+  }
+
+  .mc-hover-no {
+    display: inline;
+  }
+}
+
+.mc-box {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  margin-inline: 8px;
+  border-radius: 6px;
+  background: var(--line);
+  vertical-align: middle;
+  transition: transform var(--move), background var(--move);
+}
+
+.mc-box:hover {
+  transform: translateY(-4px);
+  background: var(--accent);
+}
+
+@media (max-width: 639px) {
+  .mc-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}

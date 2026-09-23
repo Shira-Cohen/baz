@@ -60,6 +60,7 @@ function renderHead(
   description: string,
   canonicalUrl: string,
   assetVersion: string | undefined,
+  extra = "",
 ): string {
   return `<head>
 <meta charset="utf-8">
@@ -78,7 +79,7 @@ function renderHead(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="${FONT_CSS_URL}">
-<link rel="stylesheet" href="${escapeHtml(stylesheetHref(assetVersion))}">
+<link rel="stylesheet" href="${escapeHtml(stylesheetHref(assetVersion))}">${extra}
 </head>`;
 }
 
@@ -170,6 +171,43 @@ ${renderFooter(options.year)}`;
 
   return renderDocument(
     renderHead(PAGE_TITLE, description, options.canonicalUrl, options.assetVersion),
+    body,
+  );
+}
+
+/**
+ * `/motion`: a small CSS-only self-check page. It tells the visitor whether
+ * this browser runs the site's animations and, if not, why (reduced-motion
+ * setting, missing scroll-animation support, touch-only device) and which
+ * deployment the page came from. Not linked from anywhere; noindex.
+ */
+export function renderMotionCheck(options: RenderOptions): string {
+  const version = options.assetVersion ?? "dev";
+  const checkCss = options.assetVersion
+    ? `/motion-check.css?v=${encodeURIComponent(options.assetVersion)}`
+    : "/motion-check.css";
+  const extra = `
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="${escapeHtml(checkCss)}">`;
+
+  const body = `${renderHeader()}
+<main class="container motion-check">
+<p class="notfound-code" dir="ltr">/motion</p>
+<h1 class="notfound-title">בדיקת תנועה</h1>
+<p class="mc-lead">עמוד עזר: מראה אם הדפדפן במכשיר הזה מריץ את האנימציות של האתר, ואם לא, למה.</p>
+<dl class="mc-list">
+<div class="mc-row"><dt>אנימציות CSS</dt><dd><span class="mc-track" aria-hidden="true"><span class="mc-dot"></span></span><span class="mc-note">אם הנקודה נעה מצד לצד, אנימציות עובדות כאן.</span></dd></div>
+<div class="mc-row"><dt>הפחתת תנועה במכשיר</dt><dd><span class="mc-rm-on">פעילה. המכשיר מבקש מאתרים לא להזיז דברים, והאתר מכבד את זה ולא מציג תנועה. אפשר לשנות בהגדרות הנגישות של המכשיר (ב-Windows: אפקטי אנימציה; ב-iPhone: Reduce Motion).</span><span class="mc-rm-off">לא פעילה.</span></dd></div>
+<div class="mc-row"><dt>אנימציות גלילה</dt><dd><span class="mc-sda-yes">נתמכות בדפדפן הזה.</span><span class="mc-sda-no">לא נתמכות בדפדפן הזה, ולכן הכרטיסים מוצגים בלי אפקט הגילוי בגלילה.</span></dd></div>
+<div class="mc-row"><dt>עכבר (hover)</dt><dd><span class="mc-hover-yes">יש. <span class="mc-box" aria-hidden="true"></span> העבירו את העכבר על הריבוע: הוא צריך לעלות ולהיצבע.</span><span class="mc-hover-no">אין (מסך מגע). תגובות hover לא רלוונטיות במכשיר הזה.</span></dd></div>
+<div class="mc-row"><dt>גרסת הדף</dt><dd dir="ltr">${escapeHtml(version)}</dd></div>
+</dl>
+<a class="card-cta" href="/"><span>לדף הבית</span><span class="card-cta-arrow" aria-hidden="true">←</span></a>
+</main>
+${renderFooter(options.year)}`;
+
+  return renderDocument(
+    renderHead(`בדיקת תנועה — ${SITE_NAME}`, "בדיקת תנועה", options.canonicalUrl, options.assetVersion, extra),
     body,
   );
 }

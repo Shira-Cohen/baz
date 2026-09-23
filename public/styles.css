@@ -287,7 +287,7 @@ a:focus-visible {
   }
 
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
   }
 }
 
@@ -312,11 +312,11 @@ a:focus-visible {
   }
 
   50% {
-    transform: scale(1.06);
+    transform: scale(1.08);
   }
 }
 
-/* The gauge dot rides along the arc; the arc length follows it (4deg ≈ 4.9px). */
+/* The gauge needle sweeps along the arc; the arc length follows it (6deg ≈ 7.3px). */
 @keyframes pv-orbit {
   0%,
   100% {
@@ -324,7 +324,7 @@ a:focus-visible {
   }
 
   50% {
-    transform: rotate(-4deg);
+    transform: rotate(-6deg);
   }
 }
 
@@ -335,7 +335,7 @@ a:focus-visible {
   }
 
   50% {
-    stroke-dasharray: 131.4 400;
+    stroke-dasharray: 129 400;
   }
 }
 

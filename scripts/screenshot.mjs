@@ -222,8 +222,8 @@ try {
       // part must change over time, otherwise the CSS animations are not running.
       const probe = await page("Runtime.evaluate", {
         expression: `(async () => {
-          const el = document.querySelector(".pv-cal-sun");
-          if (!el) return "no .pv-cal-sun element";
+          const el = document.querySelector(".pv-cal-sun, .mc-dot");
+          if (!el) return "no animated probe element (.pv-cal-sun / .mc-dot)";
           const before = getComputedStyle(el).transform;
           await new Promise((r) => setTimeout(r, 1500));
           const after = getComputedStyle(el).transform;

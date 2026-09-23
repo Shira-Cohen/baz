@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { escapeHtml, renderHome, renderNotFound } from "../src/render.ts";
+import { escapeHtml, renderHome, renderMotionCheck, renderNotFound } from "../src/render.ts";
 import { projects, type Project } from "../src/projects.ts";
 
 const options = { year: 2026, canonicalUrl: "https://bazy.co.il/" };
@@ -91,6 +91,14 @@ test("stylesheet URL carries the deployment version when one is known", () => {
   const versioned = renderHome(projects, { ...options, assetVersion: "4e33d9e1" });
   assert.ok(versioned.includes('<link rel="stylesheet" href="/styles.css?v=4e33d9e1">'));
   assert.ok(renderNotFound({ ...options, assetVersion: "4e33d9e1" }).includes("/styles.css?v=4e33d9e1"));
+});
+
+test("/motion self-check page shows the deployment version and its own stylesheet", () => {
+  const html = renderMotionCheck({ ...options, assetVersion: "ec3a0101" });
+  assert.ok(html.includes('<meta name="robots" content="noindex">'));
+  assert.ok(html.includes('href="/motion-check.css?v=ec3a0101"'));
+  assert.ok(html.includes('class="mc-dot"'));
+  assert.ok(html.includes('<dd dir="ltr">ec3a0101</dd>'));
 });
 
 test("404 page links back home", () => {

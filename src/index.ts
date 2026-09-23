@@ -8,7 +8,7 @@
  */
 import { inlinePreviews } from "./previews.ts";
 import { projects } from "./projects.ts";
-import { renderHome, renderNotFound } from "./render.ts";
+import { renderHome, renderMotionCheck, renderNotFound } from "./render.ts";
 
 const CANONICAL_HOST = "bazy.co.il";
 const CANONICAL_ORIGIN = `https://${CANONICAL_HOST}`;
@@ -62,6 +62,10 @@ export default {
       // Short HTML cache so a deploy is visible within a minute; the versioned
       // stylesheet URL keeps HTML and CSS consistent with each other.
       return htmlResponse(renderHome(projects, options), request, 200, "public, max-age=60");
+    }
+
+    if (url.pathname === "/motion") {
+      return htmlResponse(renderMotionCheck(options), request, 200, "no-store");
     }
 
     return htmlResponse(renderNotFound(options), request, 404, "public, max-age=60");
