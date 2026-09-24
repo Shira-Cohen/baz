@@ -31,7 +31,7 @@ export interface RenderOptions {
 const SITE_NAME = "BAZ";
 const PAGE_TITLE = "BAZ — דברים קטנים שאנחנו בונים";
 const HERO_TITLE = "דברים קטנים שאנחנו בונים";
-const HERO_INTRO = "רעיונות קטנים. מוצרים שימושיים.";
+const HERO_INTRO = "כמה דברים ששווה להכיר.";
 const SECTION_TITLE = "מה בנינו";
 const CARD_CTA = "לכניסה";
 const FOOTER_BUILT_BY = "נבנה על ידי";
