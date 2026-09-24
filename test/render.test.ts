@@ -117,6 +117,31 @@ test("head links the SVG favicon, a PNG fallback and the touch icon, all version
   assert.ok(html.includes('<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=abc12345">'));
 });
 
+test("a project marked soon renders as a card without a link", () => {
+  const soon: Project = {
+    id: "next-thing",
+    name: "הדבר הבא",
+    description: "עוד לא.",
+    category: "Tools / Soon",
+    url: "https://example.com/soon",
+    image: "/previews/x.svg",
+    status: "soon",
+  };
+  const html = renderHome([...projects, soon], options);
+  assert.ok(html.includes('<div class="card card-soon">'));
+  assert.ok(!html.includes('href="https://example.com/soon"'), "soon card must not link anywhere");
+  assert.ok(html.includes("בקרוב"));
+  assert.ok(html.includes('class="card-number" dir="ltr">04<'), "soon card still takes its number");
+});
+
+test("fonts are self-hosted and the share image is absolute and versioned", () => {
+  const html = renderHome(projects, { ...options, assetVersion: "abc12345" });
+  assert.ok(!html.includes("googleapis") && !html.includes("gstatic"), "no Google Fonts references");
+  assert.ok(html.includes('<link rel="preload" href="/fonts/heebo-hebrew.woff2" as="font" type="font/woff2" crossorigin>'));
+  assert.ok(html.includes('<meta property="og:image" content="https://bazy.co.il/og.png?v=abc12345">'));
+  assert.ok(html.includes('<meta name="twitter:card" content="summary_large_image">'));
+});
+
 test("404 page links back home", () => {
   const html = renderNotFound(options);
   assert.ok(html.includes("404"));

@@ -13,6 +13,8 @@
 - `src/render.ts` — מייצר את ה-HTML של הדף מתוך הרשימה. פונקציות טהורות, נבדקות ב-`npm test`. כל מחרוזת עוברת escaping.
 - `src/index.ts` — ה-Worker: מגיש את `/`, מפנה `www` ל-apex, מחזיר 404 לכל נתיב אחר, ומוסיף security headers (CSP, HSTS ועוד).
 - `public/brand/falcon.svg` — סימן המותג: בז יושב, בצבע אחד. משמש ב-favicon (`public/favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`) ובחותמת הקטנה בפוטר (מוטמע דרך `src/brand.ts`).
+- `public/fonts/` — Heebo מתארח באתר עצמו: פונט משתנה (100–900), קובץ לעברית וקובץ ללטינית, רישיון OFL מצורף. אין תלות ב-Google Fonts.
+- `public/og.png` — תמונת השיתוף (1200×630) שמופיעה כשמשתפים קישור בוואטסאפ או ברשתות. נוצרה מ-HTML קטן; אם הכותרת משתנה, כדאי לעדכן גם אותה.
 - `public/` — קבצים סטטיים (CSS, איורים, favicon, robots). מוגשים ישירות על ידי Workers Static Assets לפני שה-Worker רץ. אין כאן `index.html` בכוונה.
 - `wrangler.jsonc` — הגדרות ה-Worker, כולל ה-custom domains וכלל ה-`rules` שמאפשר לייבא SVG כטקסט.
 
@@ -37,6 +39,8 @@
 5. `npm run deploy`.
 
 המספור (01, 02, ...) נקבע לפי סדר המערך. לא צריך לשנות שום דבר אחר.
+
+מוצר שיש לו שם אבל עדיין אין לו כתובת יכול לקבל `status: "soon"`: הכרטיס יוצג בלי קישור ועם "בקרוב" במקום החץ.
 
 ## תנועה (motion)
 
@@ -69,6 +73,6 @@ npm run deploy     # wrangler deploy
 ## הערות
 
 - `compatibility_date` ב-`wrangler.jsonc` לא יכול להיות מאוחר מגרסת workerd המותקנת (`node_modules/workerd/package.json`), אחרת `wrangler dev` לא עולה.
-- הפונט Heebo נטען מ-Google Fonts, כמו בשאר מוצרי BAZ. אפשר בעתיד לארח אותו מקומית ולצמצם את ה-CSP ל-`'self'` בלבד.
+- ה-CSP מצומצם ל-`'self'` בלבד (אין משאבים חיצוניים בכלל). צבעי הטקסט המשני והקישורים נבחרו כך שיעברו ניגודיות 4.5:1 על רקע השמנת.
 - האיורים הנוכחיים הם איורי SVG מופשטים, לא צילומי מסך של המוצרים.
 - אין secrets בפרויקט ואין משתני סביבה להגדיר.

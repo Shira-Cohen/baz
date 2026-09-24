@@ -37,8 +37,10 @@ const CARD_CTA = "לכניסה";
 const FOOTER_BUILT_BY = "נבנה על ידי";
 const NOT_FOUND_TITLE = "הדף הזה לא קיים.";
 const NOT_FOUND_CTA = "לדף הבית";
-const FONT_CSS_URL =
-  "https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap";
+const CARD_SOON = "בקרוב";
+/** Self-hosted Heebo (variable weight, OFL) — one file per script, preloaded for the first paint. */
+const FONT_FILES = ["/fonts/heebo-hebrew.woff2", "/fonts/heebo-latin.woff2"];
+const OG_IMAGE_PATH = "/og.png";
 
 export function escapeHtml(value: string): string {
   return value
@@ -69,6 +71,10 @@ function renderHead(
   assetVersion: string | undefined,
   extra = "",
 ): string {
+  const ogImage = new URL(versioned(OG_IMAGE_PATH, assetVersion), canonicalUrl).href;
+  const preloads = FONT_FILES.map(
+    (f) => `\n<link rel="preload" href="${escapeHtml(f)}" as="font" type="font/woff2" crossorigin>`,
+  ).join("");
   return `<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -81,13 +87,15 @@ function renderHead(
 <meta property="og:description" content="${escapeHtml(description)}">
 <meta property="og:url" content="${escapeHtml(canonicalUrl)}">
 <meta property="og:locale" content="he_IL">
-<meta name="theme-color" content="#FAFAF7">
+<meta property="og:image" content="${escapeHtml(ogImage)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${escapeHtml(PAGE_TITLE)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#FAFAF7">${preloads}
 <link rel="icon" href="${escapeHtml(versioned("/favicon.svg", assetVersion))}" type="image/svg+xml">
 <link rel="icon" href="${escapeHtml(versioned("/favicon-32.png", assetVersion))}" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="${escapeHtml(versioned("/apple-touch-icon.png", assetVersion))}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="${FONT_CSS_URL}">
 <link rel="stylesheet" href="${escapeHtml(stylesheetHref(assetVersion))}">${extra}
 </head>`;
 }
@@ -133,17 +141,22 @@ function renderProject(
   index: number,
   inlinePreviews: Readonly<Record<string, string>> | undefined,
 ): string {
-  return `<li class="project">
-<a class="card" href="${escapeHtml(project.url)}">
-${renderPreview(project, index, inlinePreviews)}
+  const soon = project.status === "soon";
+  const cta = soon
+    ? `<span class="card-cta card-cta-soon"><span>${CARD_SOON}</span></span>`
+    : `<span class="card-cta"><span>${CARD_CTA}</span><span class="card-cta-arrow" aria-hidden="true">←</span></span>`;
+  const inner = `${renderPreview(project, index, inlinePreviews)}
 <div class="card-body">
 <span class="card-meta"><span class="card-number" dir="ltr">${twoDigits(index + 1)}</span><span class="card-sep" aria-hidden="true">·</span><span class="card-category" dir="ltr">${escapeHtml(project.category)}</span></span>
 <h3 class="card-title">${escapeHtml(project.name)}</h3>
 <p class="card-description">${escapeHtml(project.description)}</p>
-<span class="card-cta"><span>${CARD_CTA}</span><span class="card-cta-arrow" aria-hidden="true">←</span></span>
-</div>
-</a>
-</li>`;
+${cta}
+</div>`;
+  // A product that is not live yet is shown as a card without a link.
+  const card = soon
+    ? `<div class="card card-soon">\n${inner}\n</div>`
+    : `<a class="card" href="${escapeHtml(project.url)}">\n${inner}\n</a>`;
+  return `<li class="project">\n${card}\n</li>`;
 }
 
 function renderDocument(head: string, body: string): string {

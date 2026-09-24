@@ -1,3 +1,9 @@
 /*
   X-Content-Type-Options: nosniff
   Cache-Control: public, max-age=3600
+
+# Font files never change under the same name: detach the generic rule's
+# Cache-Control and set a long immutable one.
+/fonts/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable

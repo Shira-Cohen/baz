@@ -18,6 +18,11 @@ export interface Project {
   url: string;
   /** Site-relative path of the preview image (SVG or PNG), served from `public/`. */
   image: string;
+  /**
+   * "soon" shows the card without a link and with "בקרוב" instead of the
+   * arrow, for a product that has a name but no address yet. Default: live.
+   */
+  status?: "live" | "soon";
 }
 
 export const projects: Project[] = [
