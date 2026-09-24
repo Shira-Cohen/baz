@@ -23,6 +23,8 @@ export interface RenderOptions {
    * as a cache-buster so a new deploy never pairs new HTML with stale CSS.
    */
   assetVersion?: string;
+  /** Inline SVG of the brand mark (fill="currentColor"), shown in the footer when provided. */
+  brandMark?: string;
 }
 
 /** Wordmark shown in the header and in the footer credit. */
@@ -51,8 +53,13 @@ function twoDigits(n: number): string {
   return String(n).padStart(2, "0");
 }
 
+/** Appends the deployment version to a static asset path so caches refresh per deploy. */
+function versioned(path: string, assetVersion: string | undefined): string {
+  return assetVersion ? `${path}?v=${encodeURIComponent(assetVersion)}` : path;
+}
+
 function stylesheetHref(assetVersion: string | undefined): string {
-  return assetVersion ? `/styles.css?v=${encodeURIComponent(assetVersion)}` : "/styles.css";
+  return versioned("/styles.css", assetVersion);
 }
 
 function renderHead(
@@ -75,7 +82,9 @@ function renderHead(
 <meta property="og:url" content="${escapeHtml(canonicalUrl)}">
 <meta property="og:locale" content="he_IL">
 <meta name="theme-color" content="#FAFAF7">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="${escapeHtml(versioned("/favicon.svg", assetVersion))}" type="image/svg+xml">
+<link rel="icon" href="${escapeHtml(versioned("/favicon-32.png", assetVersion))}" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="${escapeHtml(versioned("/apple-touch-icon.png", assetVersion))}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="${FONT_CSS_URL}">
@@ -91,11 +100,15 @@ function renderHeader(): string {
 </header>`;
 }
 
-function renderFooter(year: number): string {
+function renderFooter(options: RenderOptions): string {
+  // First-party SVG from this repo (src/brand.ts), inlined verbatim.
+  const mark = options.brandMark
+    ? `<span class="footer-mark" aria-hidden="true">${options.brandMark}</span>`
+    : "";
   return `<footer class="site-footer">
 <div class="container footer-inner">
-<span>${FOOTER_BUILT_BY} <span dir="ltr">${SITE_NAME}</span></span>
-<span dir="ltr">© ${String(year)}</span>
+<span class="footer-credit">${FOOTER_BUILT_BY} <span dir="ltr">${SITE_NAME}</span>${mark}</span>
+<span dir="ltr">© ${String(options.year)}</span>
 </div>
 </footer>`;
 }
@@ -167,7 +180,7 @@ ${items}
 </ul>
 </section>
 </main>
-${renderFooter(options.year)}`;
+${renderFooter(options)}`;
 
   return renderDocument(
     renderHead(PAGE_TITLE, description, options.canonicalUrl, options.assetVersion),
@@ -204,68 +217,10 @@ export function renderMotionCheck(options: RenderOptions): string {
 </dl>
 <a class="card-cta" href="/"><span>לדף הבית</span><span class="card-cta-arrow" aria-hidden="true">←</span></a>
 </main>
-${renderFooter(options.year)}`;
+${renderFooter(options)}`;
 
   return renderDocument(
     renderHead(`בדיקת תנועה — ${SITE_NAME}`, "בדיקת תנועה", options.canonicalUrl, options.assetVersion, extra),
-    body,
-  );
-}
-
-export interface MarkVariant {
-  id: string;
-  name: string;
-  note: string;
-  /** Inline SVG with fill="currentColor" (first-party file, see src/marks.ts). */
-  svg: string;
-}
-
-/**
- * `/marks`: review page for candidate brand marks, each shown at favicon,
- * header and footer sizes and in the three colour contexts. Not linked; noindex.
- */
-export function renderMarks(options: RenderOptions, variants: readonly MarkVariant[]): string {
-  const css = options.assetVersion
-    ? `/marks-check.css?v=${encodeURIComponent(options.assetVersion)}`
-    : "/marks-check.css";
-  const extra = `
-<meta name="robots" content="noindex">
-<link rel="stylesheet" href="${escapeHtml(css)}">`;
-
-  const sections = variants
-    .map(
-      (v, i) => `<section class="mk" id="${escapeHtml(v.id)}">
-<div class="mk-head"><span class="mk-num" dir="ltr">${twoDigits(i + 1)}</span><h2 class="mk-name">${escapeHtml(v.name)}</h2><p class="mk-note">${escapeHtml(v.note)}</p></div>
-<div class="mk-row mk-sizes">
-<span class="mk-mark mk-96">${v.svg}</span>
-<span class="mk-mark mk-64">${v.svg}</span>
-<span class="mk-mark mk-32">${v.svg}</span>
-<span class="mk-mark mk-24">${v.svg}</span>
-<span class="mk-mark mk-16">${v.svg}</span>
-<span class="mk-mark mk-32 mk-accent">${v.svg}</span>
-<span class="mk-mark mk-32 mk-dark">${v.svg}</span>
-</div>
-<div class="mk-row mk-contexts">
-<div class="mk-ctx mk-ctx-header"><span class="mk-mark mk-20">${v.svg}</span><span class="wordmark" dir="ltr">${SITE_NAME}</span></div>
-<div class="mk-ctx mk-ctx-tab"><span class="mk-mark mk-16">${v.svg}</span><span class="mk-tab-title">${PAGE_TITLE}</span></div>
-<div class="mk-ctx mk-ctx-footer"><span>${FOOTER_BUILT_BY} <span dir="ltr">${SITE_NAME}</span></span><span class="mk-mark mk-14">${v.svg}</span></div>
-</div>
-</section>`,
-    )
-    .join("\n");
-
-  const body = `${renderHeader()}
-<main class="container marks-check">
-<p class="notfound-code" dir="ltr">/marks</p>
-<h1 class="notfound-title">סימני בז</h1>
-<p class="mk-lead">שלוש הצעות לסימן קטן. כל אחת מוצגת בגדלים של favicon, header ופוטר, בשחור, בטרקוטה ועל כהה, ובתוך ההקשרים שבהם היא תופיע.</p>
-${sections}
-<a class="card-cta" href="/"><span>${NOT_FOUND_CTA}</span><span class="card-cta-arrow" aria-hidden="true">←</span></a>
-</main>
-${renderFooter(options.year)}`;
-
-  return renderDocument(
-    renderHead(`סימני בז — ${SITE_NAME}`, "הצעות לסימן", options.canonicalUrl, options.assetVersion, extra),
     body,
   );
 }
@@ -277,7 +232,7 @@ export function renderNotFound(options: RenderOptions): string {
 <h1 class="notfound-title">${NOT_FOUND_TITLE}</h1>
 <a class="card-cta" href="/"><span>${NOT_FOUND_CTA}</span><span class="card-cta-arrow" aria-hidden="true">←</span></a>
 </main>
-${renderFooter(options.year)}`;
+${renderFooter(options)}`;
 
   return renderDocument(
     renderHead(`404 — ${SITE_NAME}`, NOT_FOUND_TITLE, options.canonicalUrl, options.assetVersion),

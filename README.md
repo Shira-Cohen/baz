@@ -12,6 +12,7 @@
 - `src/previews.ts` — רישום האיורים (SVG) שמוטמעים ישירות בדף כדי שה-CSS יוכל להזיז אלמנטים בתוכם.
 - `src/render.ts` — מייצר את ה-HTML של הדף מתוך הרשימה. פונקציות טהורות, נבדקות ב-`npm test`. כל מחרוזת עוברת escaping.
 - `src/index.ts` — ה-Worker: מגיש את `/`, מפנה `www` ל-apex, מחזיר 404 לכל נתיב אחר, ומוסיף security headers (CSP, HSTS ועוד).
+- `public/brand/falcon.svg` — סימן המותג: בז יושב, בצבע אחד. משמש ב-favicon (`public/favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`) ובחותמת הקטנה בפוטר (מוטמע דרך `src/brand.ts`).
 - `public/` — קבצים סטטיים (CSS, איורים, favicon, robots). מוגשים ישירות על ידי Workers Static Assets לפני שה-Worker רץ. אין כאן `index.html` בכוונה.
 - `wrangler.jsonc` — הגדרות ה-Worker, כולל ה-custom domains וכלל ה-`rules` שמאפשר לייבא SVG כטקסט.
 
