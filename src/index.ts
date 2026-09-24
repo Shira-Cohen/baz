@@ -6,9 +6,10 @@
  * file lands here: `/` is rendered from `src/projects.ts`, `www.` redirects to
  * the apex, everything else is a small 404 page.
  */
+import { markVariants } from "./marks.ts";
 import { inlinePreviews } from "./previews.ts";
 import { projects } from "./projects.ts";
-import { renderHome, renderMotionCheck, renderNotFound } from "./render.ts";
+import { renderHome, renderMarks, renderMotionCheck, renderNotFound } from "./render.ts";
 
 const CANONICAL_HOST = "bazy.co.il";
 const CANONICAL_ORIGIN = `https://${CANONICAL_HOST}`;
@@ -66,6 +67,10 @@ export default {
 
     if (url.pathname === "/motion") {
       return htmlResponse(renderMotionCheck(options), request, 200, "no-store");
+    }
+
+    if (url.pathname === "/marks") {
+      return htmlResponse(renderMarks(options, markVariants), request, 200, "no-store");
     }
 
     return htmlResponse(renderNotFound(options), request, 404, "public, max-age=60");

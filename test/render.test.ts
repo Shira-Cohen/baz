@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { escapeHtml, renderHome, renderMotionCheck, renderNotFound } from "../src/render.ts";
+import { escapeHtml, renderHome, renderMarks, renderMotionCheck, renderNotFound } from "../src/render.ts";
 import { projects, type Project } from "../src/projects.ts";
 
 const options = { year: 2026, canonicalUrl: "https://bazy.co.il/" };
@@ -99,6 +99,16 @@ test("/motion self-check page shows the deployment version and its own styleshee
   assert.ok(html.includes('href="/motion-check.css?v=ec3a0101"'));
   assert.ok(html.includes('class="mc-dot"'));
   assert.ok(html.includes('<dd dir="ltr">ec3a0101</dd>'));
+});
+
+test("/marks review page inlines every candidate mark and escapes its text", () => {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="currentColor"><path d="M0 0h64v64z"/></svg>';
+  const html = renderMarks(options, [{ id: "test", name: "<b>x</b>", note: "a & b", svg }]);
+  assert.ok(html.includes('<meta name="robots" content="noindex">'));
+  assert.ok(html.includes('id="test"'));
+  assert.ok(html.split(svg).length - 1 >= 8, "mark rendered at every size and context");
+  assert.ok(html.includes("&lt;b&gt;x&lt;/b&gt;") && !html.includes("<b>x</b>"));
+  assert.ok(html.includes("a &amp; b"));
 });
 
 test("404 page links back home", () => {

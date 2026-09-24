@@ -243,7 +243,8 @@ try {
       });
       const result = String(probe.result?.value ?? "");
       console.log(`idle motion probe: ${result}`);
-      if (result.startsWith("STATIC") || result.startsWith("no ")) note("motion", result);
+      // A page without an animated element (e.g. /marks) is fine; a frozen one is not.
+      if (result.startsWith("STATIC")) note("motion", result);
     }
 
     // Viewport-only shot after scrolling to the bottom: shows scroll-driven
