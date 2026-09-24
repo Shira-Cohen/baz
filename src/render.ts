@@ -103,7 +103,7 @@ function renderHead(
 function renderHeader(): string {
   return `<header class="site-header">
 <div class="container header-inner">
-<a class="wordmark" href="/" dir="ltr">${SITE_NAME}</a>
+<a class="wordmark" href="/" dir="ltr" lang="en">${SITE_NAME}</a>
 </div>
 </header>`;
 }
@@ -115,7 +115,7 @@ function renderFooter(options: RenderOptions): string {
     : "";
   return `<footer class="site-footer">
 <div class="container footer-inner">
-<span class="footer-credit">${FOOTER_BUILT_BY} <span dir="ltr">${SITE_NAME}</span>${mark}</span>
+<span class="footer-credit">${FOOTER_BUILT_BY} <span dir="ltr" lang="en">${SITE_NAME}</span>${mark}</span>
 <span dir="ltr">© ${String(options.year)}</span>
 </div>
 </footer>`;
@@ -147,7 +147,7 @@ function renderProject(
     : `<span class="card-cta"><span>${CARD_CTA}</span><span class="card-cta-arrow" aria-hidden="true">←</span></span>`;
   const inner = `${renderPreview(project, index, inlinePreviews)}
 <div class="card-body">
-<span class="card-meta"><span class="card-number" dir="ltr">${twoDigits(index + 1)}</span><span class="card-sep" aria-hidden="true">·</span><span class="card-category" dir="ltr">${escapeHtml(project.category)}</span></span>
+<span class="card-meta"><span class="card-number" dir="ltr">${twoDigits(index + 1)}</span><span class="card-sep" aria-hidden="true">·</span><span class="card-category" dir="ltr" lang="en">${escapeHtml(project.category)}</span></span>
 <h3 class="card-title">${escapeHtml(project.name)}</h3>
 <p class="card-description">${escapeHtml(project.description)}</p>
 ${cta}
@@ -186,7 +186,7 @@ export function renderHome(projects: readonly Project[], options: RenderOptions)
 <section id="projects" class="projects container" aria-labelledby="projects-title">
 <div class="section-head">
 <h2 id="projects-title" class="section-title">${SECTION_TITLE}</h2>
-<span class="section-count" dir="ltr">${twoDigits(projects.length)}</span>
+<span class="section-count" dir="ltr"><span class="sr-only">מספר הפרויקטים: </span>${twoDigits(projects.length)}</span>
 </div>
 <ul class="project-grid">
 ${items}
@@ -218,7 +218,7 @@ export function renderMotionCheck(options: RenderOptions): string {
 
   const body = `${renderHeader()}
 <main class="container motion-check">
-<p class="notfound-code" dir="ltr">/motion</p>
+<p class="notfound-code"><span dir="ltr">/motion</span></p>
 <h1 class="notfound-title">בדיקת תנועה</h1>
 <p class="mc-lead">עמוד עזר: מראה אם הדפדפן במכשיר הזה מריץ את האנימציות של האתר, ואם לא, למה.</p>
 <dl class="mc-list">
@@ -241,7 +241,7 @@ ${renderFooter(options)}`;
 export function renderNotFound(options: RenderOptions): string {
   const body = `${renderHeader()}
 <main class="container notfound">
-<p class="notfound-code" dir="ltr">404</p>
+<p class="notfound-code"><span dir="ltr">404</span></p>
 <h1 class="notfound-title">${NOT_FOUND_TITLE}</h1>
 <a class="card-cta" href="/"><span>${NOT_FOUND_CTA}</span><span class="card-cta-arrow" aria-hidden="true">←</span></a>
 </main>

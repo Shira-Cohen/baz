@@ -85,6 +85,18 @@ a:focus-visible {
   padding-inline: var(--pad);
 }
 
+/* Text for screen readers only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* Header */
 .site-header {
   border-bottom: 1px solid var(--line);
@@ -188,6 +200,60 @@ a:focus-visible {
   .project-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 56px 40px;
+  }
+}
+
+/* A lone card on the last row spans the row and turns into a feature:
+   illustration on the start side, text beside it. Nothing is cropped. */
+@media (min-width: 640px) and (max-width: 1199px) {
+  .project:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .project:last-child:nth-child(odd) .card {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 28px;
+  }
+
+  .project:last-child:nth-child(odd) .card-preview {
+    flex: 0 0 calc(50% - 14px);
+  }
+
+  .project:last-child:nth-child(odd) .card-body {
+    flex: 1;
+    justify-content: center;
+    margin-top: 0;
+    padding-top: 0;
+    padding-inline-start: 24px;
+    border-top: 0;
+    border-inline-start: 1px solid var(--line);
+  }
+}
+
+@media (min-width: 1200px) {
+  .project:last-child:nth-child(3n + 1) {
+    grid-column: 1 / -1;
+  }
+
+  .project:last-child:nth-child(3n + 1) .card {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 40px;
+  }
+
+  .project:last-child:nth-child(3n + 1) .card-preview {
+    flex: 0 0 calc((100% - 80px) / 3);
+  }
+
+  .project:last-child:nth-child(3n + 1) .card-body {
+    flex: 1;
+    justify-content: center;
+    margin-top: 0;
+    padding-top: 0;
+    padding-inline-start: 32px;
+    border-top: 0;
+    border-inline-start: 1px solid var(--line);
   }
 }
 
