@@ -10,9 +10,11 @@
 
 1. [הוספת מוצר חדש](#הוספת-מוצר-חדש) — המדריך שרוב האנשים מחפשים
 2. [איך זה בנוי](#איך-זה-בנוי)
-3. [תנועה (motion)](#תנועה-motion)
-4. [פקודות](#פקודות)
-5. [הערות](#הערות)
+3. [SEO](#seo)
+4. [תצוגת עיצוב ("מה זה BAZ?")](#תצוגת-עיצוב-מה-זה-baz)
+5. [תנועה (motion)](#תנועה-motion)
+6. [פקודות](#פקודות)
+7. [הערות](#הערות)
 
 ## הוספת מוצר חדש
 
@@ -33,10 +35,12 @@
 }
 ```
 
-שדה אופציונלי נוסף:
+שדות אופציונליים נוספים:
 
 ```ts
-status: "soon",   // אם עדיין אין כתובת חיה: הכרטיס מוצג בלי קישור, עם "בקרוב" במקום החץ
+status: "soon",            // אם עדיין אין כתובת חיה: הכרטיס מוצג בלי קישור, עם "בקרוב" במקום החץ
+localPath: "/my-product",  // יוצר עמוד SEO קטן בכתובת הזו, ראו "SEO" למטה
+longDescription: "...",    // פסקה ארוכה יותר, מוצגת בעמוד ה-SEO של המוצר במקום description
 ```
 
 בלי `status` (או עם `status: "live"`) המוצר מוצג ככרטיס לחיץ רגיל.
@@ -133,8 +137,23 @@ export const projects: Project[] = [
 | `public/previews/` | תמונות ה-preview של המוצרים (SVG/PNG). |
 | `public/` | קבצים סטטיים נוספים (CSS, favicon, robots, `_headers`). מוגשים ישירות על ידי Workers Static Assets לפני שה-Worker רץ. אין כאן `index.html` בכוונה — כך ש-`/` מגיע ל-Worker ומרונדר מ-`src/projects.ts`. |
 | `wrangler.jsonc` | הגדרות ה-Worker: שם, custom domains, כלל ה-`rules` שמאפשר לייבא SVG כטקסט, ה-binding ל-`CF_VERSION_METADATA`. |
-| `test/render.test.ts` | בדיקות יחידה: escaping, תקינות הקונפיגורציה, מספור, headers, ועוד. |
+| `test/render.test.ts` | בדיקות יחידה: escaping, תקינות הקונפיגורציה, מספור, headers, JSON-LD, sitemap, ועוד. |
 | `scripts/screenshot.mjs` | כלי לצילום המסך (desktop/tablet/mobile) ובדיקת שגיאות console, דרך Chrome headless. |
+
+## SEO
+
+- **`<title>` ו-meta description** של דף הבית מוגדרים כקבועים ב-`src/render.ts` (`PAGE_TITLE`, וה-`description` בתוך `renderHome`). אם משנים את שלושת המוצרים הראשיים, שווה לעדכן את שתי המחרוזות האלה כדי שימשיכו לשקף את התוכן בפועל.
+- **Structured data (JSON-LD)**: דף הבית נושא `WebSite` + `Organization` + `ItemList` (רשימת המוצרים עם עמוד ה-SEO שלהם). כל עמוד מוצר (`/family-calendar` וכו') נושא `BreadcrumbList`. נוצר ב-`jsonLdScript()` ב-`src/render.ts` — פונקציה שגם מגינה מפני שליטה שמנסה לסגור את ה-`<script>` מוקדם.
+- **עמודי מוצר** (`/family-calendar`, `/family-reminders`, `/car-cost`): עמוד SEO קטן לכל מוצר שיש לו `localPath` ב-`src/projects.ts`. כותרת, meta description ו-canonical משלו, פסקה (`longDescription` אם קיים, אחרת `description`), האיור של המוצר, וכפתור "להמשיך ל..." שמוביל ל-`url` האמיתי. נוצר על ידי `renderProjectPage` ב-`src/render.ts` ומנותב ב-`src/index.ts`.
+- **`/sitemap.xml`**: נוצר דינמית מתוך `projects` (דף הבית + כל `localPath`) — אין צורך לעדכן קובץ XML בנפרד כשמוסיפים מוצר.
+- **`robots.txt`**: מרשה הכול, חוסם את `/motion` ואת `/design-review/` (עמודי עזר/תצוגה שלא צריכים להתאנדקס), ומצביע על ה-sitemap.
+- **ביצועים/נגישות**: אין JavaScript בכלל בשום עמוד, כל התוכן המרכזי מגיע כ-HTML מהשרת (לא תלוי בשום script), תמונות הכרטיסים הן SVG מוטמע בלי בקשת רשת נוספת, הפונטים מתארחים באתר עם `preload`, ול-img fallback יש `width`/`height` קבועים כדי למנוע CLS.
+
+## תצוגת עיצוב ("מה זה BAZ?")
+
+שלוש הצעות לסקשן חדש בדף הבית שמסביר מה זה BAZ, כל אחת ב-`/design-review/a`, `/design-review/b`, `/design-review/c` — דף הבית האמיתי (hero + גריד הפרויקטים) עם הצעה אחת מתחתיו, לפני הפוטר. לא מקושרים משום מקום, `noindex`, ולא חלק מדף הבית בפועל.
+
+הקוד: שלוש פונקציות `renderAboutA/B/C` ב-`src/render.ts`, וה-CSS שלהן ב-`public/styles.css` תחת ההערה `"What is BAZ"`. **לאחר שנבחרת גרסה**: להעביר את ה-section הנבחר לתוך `renderHome`, למחוק את שתי הגרסאות האחרות (הפונקציה + ה-CSS), ולמחוק את `renderDesignReview` ואת ה-route שלו ב-`src/index.ts`.
 
 ## תנועה (motion)
 
