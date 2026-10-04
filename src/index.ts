@@ -10,22 +10,13 @@
 import { brandMark } from "./brand.ts";
 import { inlinePreviews } from "./previews.ts";
 import { projects } from "./projects.ts";
-import {
-  type AboutVariant,
-  renderDesignReview,
-  renderHome,
-  renderMotionCheck,
-  renderNotFound,
-  renderProjectPage,
-  renderSitemap,
-} from "./render.ts";
+import { renderHome, renderMotionCheck, renderNotFound, renderProjectPage, renderSitemap } from "./render.ts";
 
 const CANONICAL_HOST = "bazy.co.il";
 const CANONICAL_ORIGIN = `https://${CANONICAL_HOST}`;
 const REDIRECT_HOSTS = new Set([`www.${CANONICAL_HOST}`]);
 
 const PROJECT_PAGES = new Map(projects.filter((p) => p.localPath).map((p) => [p.localPath as string, p]));
-const DESIGN_REVIEW_VARIANTS = new Set<AboutVariant>(["a", "b", "c"]);
 
 const SECURITY_HEADERS: Record<string, string> = {
   "content-security-policy":
@@ -97,18 +88,6 @@ export default {
           "cache-control": "public, max-age=3600",
         },
       });
-    }
-
-    if (url.pathname.startsWith("/design-review/")) {
-      const variant = url.pathname.slice("/design-review/".length);
-      if (DESIGN_REVIEW_VARIANTS.has(variant as AboutVariant)) {
-        return htmlResponse(
-          renderDesignReview(variant as AboutVariant, projects, options),
-          request,
-          200,
-          "no-store",
-        );
-      }
     }
 
     return htmlResponse(renderNotFound(options), request, 404, "public, max-age=60");

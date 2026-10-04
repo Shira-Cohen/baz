@@ -11,7 +11,7 @@
 1. [הוספת מוצר חדש](#הוספת-מוצר-חדש) — המדריך שרוב האנשים מחפשים
 2. [איך זה בנוי](#איך-זה-בנוי)
 3. [SEO](#seo)
-4. [תצוגת עיצוב ("מה זה BAZ?")](#תצוגת-עיצוב-מה-זה-baz)
+4. ["מה זה BAZ?"](#מה-זה-baz)
 5. [תנועה (motion)](#תנועה-motion)
 6. [פקודות](#פקודות)
 7. [הערות](#הערות)
@@ -142,18 +142,16 @@ export const projects: Project[] = [
 
 ## SEO
 
-- **`<title>` ו-meta description** של דף הבית מוגדרים כקבועים ב-`src/render.ts` (`PAGE_TITLE`, וה-`description` בתוך `renderHome`). אם משנים את שלושת המוצרים הראשיים, שווה לעדכן את שתי המחרוזות האלה כדי שימשיכו לשקף את התוכן בפועל.
+- **`<title>` ו-meta description** של דף הבית מוגדרים כקבועים ב-`src/render.ts` (`PAGE_TITLE`, וה-`description` בתוך `renderHome`). בכוונה הם מנוסחים כהצהרת מיקום כללית ("רעיונות שהופכים למוצרים שימושיים") ולא כרשימת המוצרים הנוכחיים — כך שהם ממשיכים להתאים גם כשיתווספו מוצרים מתחומים אחרים. מילות החיפוש הספציפיות של כל מוצר (שם המוצר, "לוח שנה משפחתי" וכו') נמצאות ב-title/description של עמוד המוצר שלו, לא בדף הבית.
 - **Structured data (JSON-LD)**: דף הבית נושא `WebSite` + `Organization` + `ItemList` (רשימת המוצרים עם עמוד ה-SEO שלהם). כל עמוד מוצר (`/family-calendar` וכו') נושא `BreadcrumbList`. נוצר ב-`jsonLdScript()` ב-`src/render.ts` — פונקציה שגם מגינה מפני שליטה שמנסה לסגור את ה-`<script>` מוקדם.
 - **עמודי מוצר** (`/family-calendar`, `/family-reminders`, `/car-cost`): עמוד SEO קטן לכל מוצר שיש לו `localPath` ב-`src/projects.ts`. כותרת, meta description ו-canonical משלו, פסקה (`longDescription` אם קיים, אחרת `description`), האיור של המוצר, וכפתור "להמשיך ל..." שמוביל ל-`url` האמיתי. נוצר על ידי `renderProjectPage` ב-`src/render.ts` ומנותב ב-`src/index.ts`.
 - **`/sitemap.xml`**: נוצר דינמית מתוך `projects` (דף הבית + כל `localPath`) — אין צורך לעדכן קובץ XML בנפרד כשמוסיפים מוצר.
-- **`robots.txt`**: מרשה הכול, חוסם את `/motion` ואת `/design-review/` (עמודי עזר/תצוגה שלא צריכים להתאנדקס), ומצביע על ה-sitemap.
+- **`robots.txt`**: מרשה הכול, חוסם את `/motion` (עמוד עזר שלא צריך להתאנדקס), ומצביע על ה-sitemap.
 - **ביצועים/נגישות**: אין JavaScript בכלל בשום עמוד, כל התוכן המרכזי מגיע כ-HTML מהשרת (לא תלוי בשום script), תמונות הכרטיסים הן SVG מוטמע בלי בקשת רשת נוספת, הפונטים מתארחים באתר עם `preload`, ול-img fallback יש `width`/`height` קבועים כדי למנוע CLS.
 
-## תצוגת עיצוב ("מה זה BAZ?")
+## "מה זה BAZ?"
 
-שלוש הצעות לסקשן חדש בדף הבית שמסביר מה זה BAZ, כל אחת ב-`/design-review/a`, `/design-review/b`, `/design-review/c` — דף הבית האמיתי (hero + גריד הפרויקטים) עם הצעה אחת מתחתיו, לפני הפוטר. לא מקושרים משום מקום, `noindex`, ולא חלק מדף הבית בפועל.
-
-הקוד: שלוש פונקציות `renderAboutA/B/C` ב-`src/render.ts`, וה-CSS שלהן ב-`public/styles.css` תחת ההערה `"What is BAZ"`. **לאחר שנבחרת גרסה**: להעביר את ה-section הנבחר לתוך `renderHome`, למחוק את שתי הגרסאות האחרות (הפונקציה + ה-CSS), ולמחוק את `renderDesignReview` ואת ה-route שלו ב-`src/index.ts`.
+הסקשן שמסביר מה זה BAZ, בין גריד הפרויקטים לפוטר. נבחר מתוך שלוש הצעות עיצוב שנסקרו לפני כן ב-`/design-review/a|b|c` (לא קיימים יותר — הוסרו לאחר שנבחרה גרסה, כמתועד ב-commit history). הקוד: `renderAboutSection()` ב-`src/render.ts`, הטקסט בקבועים `ABOUT_TEXT`/`ABOUT_SUB`, ה-CSS ב-`public/styles.css` תחת ההערה `"What is BAZ"`. עדכון הטקסט = שינוי שני הקבועים; אין צורך לגעת בשום מקום אחר.
 
 ## תנועה (motion)
 

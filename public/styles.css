@@ -593,7 +593,8 @@ a:focus-visible {
   }
 
   .section-head,
-  .project {
+  .project,
+  .about {
     animation: reveal linear both;
     animation-timeline: view();
     animation-range: entry 0% entry 45%;
@@ -670,52 +671,28 @@ a:focus-visible {
   height: 100%;
 }
 
-/* "What is BAZ" — three composition candidates under review at /design-review/a|b|c.
-   Whichever is chosen stays; the other two get deleted along with this comment. */
-
-/* A: a quiet typographic statement, a direct continuation of the hero's flow. */
-.about-a {
-  padding-block: clamp(48px, 10vh, 96px);
-}
-
-.about-a-label {
-  margin: 0 0 18px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.about-a-text {
-  margin: 0;
-  max-width: 38ch;
-  font-size: clamp(1.15rem, 2.2vw, 1.4rem);
-  font-weight: 300;
-  line-height: 1.55;
-  color: var(--ink);
-  text-wrap: pretty;
-}
-
-/* B: an asymmetric two-column editorial layout — question in its own column, answer in the main one. */
-.about-b {
+/* "What is BAZ": an asymmetric two-column editorial block between the
+   project grid and the footer. Chosen from three candidates reviewed live. */
+.about {
   padding-block: clamp(48px, 10vh, 96px);
   border-top: 1px solid var(--line);
 }
 
-.about-b-grid {
+.about-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
 }
 
 @media (min-width: 720px) {
-  .about-b-grid {
+  .about-grid {
     grid-template-columns: minmax(180px, 280px) 1fr;
     gap: 48px;
     align-items: start;
   }
 }
 
-.about-b-label {
+.about-label {
   margin: 0;
   font-size: clamp(1.4rem, 2.6vw, 1.9rem);
   font-weight: 300;
@@ -723,7 +700,13 @@ a:focus-visible {
   color: var(--ink);
 }
 
-.about-b-text {
+.about-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.about-text {
   margin: 0;
   max-width: 54ch;
   color: var(--muted);
@@ -732,49 +715,12 @@ a:focus-visible {
   text-wrap: pretty;
 }
 
-/* C: echoes the project grid's own section head above it — hairline rule, accent square, a small mark. */
-.about-c {
-  padding-block: clamp(48px, 10vh, 96px);
-}
-
-.about-c-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding-top: 18px;
-  margin-bottom: 24px;
-  border-top: 1px solid var(--line);
-}
-
-.about-c-label {
+.about-sub {
   margin: 0;
+  max-width: 54ch;
+  color: var(--faint);
   font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.about-c-mark {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  color: var(--accent);
-  line-height: 0;
-}
-
-.about-c-mark svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.about-c-text {
-  margin: 0;
-  max-width: 60ch;
-  padding-inline-start: 20px;
-  border-inline-start: 2px solid var(--accent);
-  color: var(--ink);
-  font-size: 1.1rem;
-  line-height: 1.65;
+  line-height: 1.55;
   text-wrap: pretty;
 }
 
@@ -908,7 +854,8 @@ a:focus-visible {
   .hero-title,
   .hero-intro,
   .section-head,
-  .project {
+  .project,
+  .about {
     animation-name: fade-only;
   }
 }

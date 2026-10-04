@@ -29,7 +29,7 @@ export interface RenderOptions {
 
 /** Wordmark shown in the header and wherever "BAZ" appears in running Hebrew text. */
 const SITE_NAME = "BAZ";
-const PAGE_TITLE = "BAZ — לוח שנה משפחתי, תזכורות ומחשבון הוצאות רכב";
+const PAGE_TITLE = "BAZ - רעיונות שהופכים למוצרים שימושיים";
 const HERO_TITLE = "דברים קטנים שאנחנו בונים";
 const HERO_INTRO = "כמה דברים ששווה להכיר.";
 const SECTION_TITLE = "מה בנינו";
@@ -38,9 +38,9 @@ const FOOTER_BUILT_BY = "נבנה על ידי";
 const NOT_FOUND_TITLE = "הדף הזה לא קיים.";
 const NOT_FOUND_CTA = "לדף הבית";
 const CARD_SOON = "בקרוב";
-const ABOUT_LABEL = "מה זה BAZ?";
 const ABOUT_TEXT =
-  "BAZ הוא בית לכלים ופרויקטים שאנחנו בונים כדי לפתור דברים מהיום-יום: לוח שנה משפחתי, תזכורות, ומחשבון שעוזר לחשב כמה הרכב באמת עולה. כל כלי עומד בפני עצמו, ונבנה כדי לעשות דבר אחד טוב.";
+  "BAZ הוא המקום שבו צורך אמיתי הופך לרעיון, ורעיון הופך למוצר שימושי.";
+const ABOUT_SUB = "פשוט לשימוש, נוח, ועם מחשבה על הפרטים.";
 /** Self-hosted Heebo (variable weight, OFL) — one file per script, preloaded for the first paint. */
 const FONT_FILES = ["/fonts/heebo-hebrew.woff2", "/fonts/heebo-latin.woff2"];
 const OG_IMAGE_PATH = "/og.png";
@@ -197,7 +197,20 @@ function renderHeroSection(): string {
 </section>`;
 }
 
-/** The project grid, reused by the homepage and by the `/design-review/*` previews so they show it in real context. */
+/** "What is BAZ": an asymmetric two-column editorial block — the question sits in its own narrow column, the answer in the main one. Sits between the project grid and the footer. */
+function renderAboutSection(): string {
+  return `<section class="about container" aria-labelledby="about-title">
+<div class="about-grid">
+<h2 id="about-title" class="about-label">מה זה<br>${brandSpan()}?</h2>
+<div class="about-copy">
+<p class="about-text">${escapeHtml(ABOUT_TEXT)}</p>
+<p class="about-sub">${escapeHtml(ABOUT_SUB)}</p>
+</div>
+</div>
+</section>`;
+}
+
+/** The project grid, reused by the homepage so the grid markup has one source. */
 function renderProjectsSection(
   projects: readonly Project[],
   inlinePreviews: Readonly<Record<string, string>> | undefined,
@@ -216,7 +229,7 @@ ${items}
 
 export function renderHome(projects: readonly Project[], options: RenderOptions): string {
   const description =
-    "BAZ הוא בית לכלים ופרויקטים שימושיים למשפחה וליום־יום: לוח שנה משפחתי, תזכורות אישיות, ומחשבון שמחשב כמה הרכב באמת עולה.";
+    "BAZ הוא בית למוצרים ופרויקטים שימושיים שנולדו מתוך צורך אמיתי. בין המוצרים שלנו: לוח שנה משפחתי, מערכת תזכורות, מחשבון הוצאות רכב ועוד.";
 
   const jsonLd = jsonLdScript({
     "@context": "https://schema.org",
@@ -252,6 +265,7 @@ export function renderHome(projects: readonly Project[], options: RenderOptions)
 <main>
 ${renderHeroSection()}
 ${renderProjectsSection(projects, options.inlinePreviews)}
+${renderAboutSection()}
 </main>
 ${renderFooter(options)}`;
 
@@ -345,72 +359,6 @@ ${renderFooter(options)}`;
 
   return renderDocument(
     renderHead(`בדיקת תנועה — ${SITE_NAME}`, "בדיקת תנועה", options.canonicalUrl, options.assetVersion, extra),
-    body,
-  );
-}
-
-export type AboutVariant = "a" | "b" | "c";
-
-/** Variant A: a quiet typographic statement, a direct continuation of the hero's flow — no rules, no box. */
-function renderAboutA(): string {
-  return `<section class="about-a container" aria-labelledby="about-a-title">
-<h2 id="about-a-title" class="about-a-label">${escapeHtml(ABOUT_LABEL)}</h2>
-<p class="about-a-text">${escapeHtml(ABOUT_TEXT)}</p>
-</section>`;
-}
-
-/** Variant B: an asymmetric two-column editorial layout — the question sits in its own narrow column, the answer in the main column. */
-function renderAboutB(): string {
-  return `<section class="about-b container" aria-labelledby="about-b-title">
-<div class="about-b-grid">
-<h2 id="about-b-title" class="about-b-label">מה זה<br>${brandSpan()}?</h2>
-<p class="about-b-text">${escapeHtml(ABOUT_TEXT)}</p>
-</div>
-</section>`;
-}
-
-/** Variant C: echoes the project grid's own header above it — hairline rule, accent square, a small mark — and the paragraph borrows the card body's accent rule. */
-function renderAboutC(brandMark: string | undefined): string {
-  const mark = brandMark ? `<span class="about-c-mark" aria-hidden="true">${brandMark}</span>` : "";
-  return `<section class="about-c container" aria-labelledby="about-c-title">
-<div class="about-c-head">
-<h2 id="about-c-title" class="about-c-label">${escapeHtml(ABOUT_LABEL)}</h2>
-${mark}
-</div>
-<p class="about-c-text">${escapeHtml(ABOUT_TEXT)}</p>
-</section>`;
-}
-
-/**
- * `/design-review/a|b|c`: the real homepage (hero + project grid, unchanged)
- * with one candidate "what is BAZ" section appended before the footer, so
- * each variant is seen in its actual context rather than in isolation. Not
- * linked from anywhere; noindex; meant to be removed once a variant is chosen.
- */
-export function renderDesignReview(
-  variant: AboutVariant,
-  projects: readonly Project[],
-  options: RenderOptions,
-): string {
-  const about =
-    variant === "a" ? renderAboutA() : variant === "b" ? renderAboutB() : renderAboutC(options.brandMark);
-
-  const body = `${renderHeader()}
-<main>
-${renderHeroSection()}
-${renderProjectsSection(projects, options.inlinePreviews)}
-${about}
-</main>
-${renderFooter(options)}`;
-
-  return renderDocument(
-    renderHead(
-      `תצוגה: וריאציה ${variant} — ${SITE_NAME}`,
-      "עמוד תצוגה פנימי, לא לאינדקס.",
-      options.canonicalUrl,
-      options.assetVersion,
-      '\n<meta name="robots" content="noindex">',
-    ),
     body,
   );
 }

@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /motion
-Disallow: /design-review/
 
 Sitemap: https://bazy.co.il/sitemap.xml

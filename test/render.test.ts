@@ -5,7 +5,6 @@ import { fileURLToPath } from "node:url";
 
 import {
   escapeHtml,
-  renderDesignReview,
   renderHome,
   renderMotionCheck,
   renderNotFound,
@@ -209,12 +208,9 @@ test("sitemap lists the home page and every project localPath, as absolute URLs"
   }
 });
 
-test("design-review previews show the real hero and grid plus one noindex'd about variant", () => {
-  for (const variant of ["a", "b", "c"] as const) {
-    const html = renderDesignReview(variant, projects, options);
-    assert.ok(html.includes('<meta name="robots" content="noindex">'), `${variant}: noindex`);
-    assert.ok(html.includes('class="hero-title"'), `${variant}: keeps the real hero`);
-    assert.ok(html.includes('id="projects"'), `${variant}: keeps the real project grid`);
-    assert.ok(html.includes(`about-${variant}`), `${variant}: renders its own section`);
-  }
+test("home page renders the chosen 'what is BAZ' section with its final copy", () => {
+  const html = renderHome(projects, options);
+  assert.ok(html.includes('id="about-title" class="about-label">מה זה<br>'));
+  assert.ok(html.includes("BAZ הוא המקום שבו צורך אמיתי הופך לרעיון, ורעיון הופך למוצר שימושי."));
+  assert.ok(html.includes("פשוט לשימוש, נוח, ועם מחשבה על הפרטים."));
 });
