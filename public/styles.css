@@ -344,14 +344,20 @@ a:focus-visible {
   color: var(--faint);
 }
 
-/* Touch: no hover, so the card answers the press instead */
-.card {
+/* Touch: no hover, so the card (and the product-page CTA) answers the press instead */
+.card,
+.product-cta {
   -webkit-tap-highlight-color: transparent;
 }
 
 @media (hover: none) {
   a.card:active {
     transform: translateY(1px) scale(0.99);
+    transition-duration: 120ms;
+  }
+
+  .product-cta:active {
+    transform: translateY(1px) scale(0.98);
     transition-duration: 120ms;
   }
 }
@@ -662,6 +668,203 @@ a:focus-visible {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* "What is BAZ" — three composition candidates under review at /design-review/a|b|c.
+   Whichever is chosen stays; the other two get deleted along with this comment. */
+
+/* A: a quiet typographic statement, a direct continuation of the hero's flow. */
+.about-a {
+  padding-block: clamp(48px, 10vh, 96px);
+}
+
+.about-a-label {
+  margin: 0 0 18px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.about-a-text {
+  margin: 0;
+  max-width: 38ch;
+  font-size: clamp(1.15rem, 2.2vw, 1.4rem);
+  font-weight: 300;
+  line-height: 1.55;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+/* B: an asymmetric two-column editorial layout — question in its own column, answer in the main one. */
+.about-b {
+  padding-block: clamp(48px, 10vh, 96px);
+  border-top: 1px solid var(--line);
+}
+
+.about-b-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 720px) {
+  .about-b-grid {
+    grid-template-columns: minmax(180px, 280px) 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+}
+
+.about-b-label {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  font-weight: 300;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.about-b-text {
+  margin: 0;
+  max-width: 54ch;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* C: echoes the project grid's own section head above it — hairline rule, accent square, a small mark. */
+.about-c {
+  padding-block: clamp(48px, 10vh, 96px);
+}
+
+.about-c-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: 18px;
+  margin-bottom: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.about-c-label {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.about-c-mark {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+  line-height: 0;
+}
+
+.about-c-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.about-c-text {
+  margin: 0;
+  max-width: 60ch;
+  padding-inline-start: 20px;
+  border-inline-start: 2px solid var(--accent);
+  color: var(--ink);
+  font-size: 1.1rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+/* Product landing pages (/family-calendar, /family-reminders, /car-cost): a
+   small SEO page that explains one product and sends the visitor to the real
+   app. Reuses .card-preview/.card-cta-arrow from the project cards above. */
+.product-page {
+  padding-block: clamp(56px, 10vh, 100px) clamp(64px, 12vh, 140px);
+}
+
+.product-back {
+  margin-bottom: 32px;
+  font-size: 0.9rem;
+}
+
+.product-head {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+@media (min-width: 720px) {
+  .product-head {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 40px;
+  }
+
+  .product-head .card-preview {
+    flex: 0 0 38%;
+  }
+
+  .product-head-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-inline-start: 32px;
+    border-inline-start: 1px solid var(--line);
+  }
+}
+
+.product-meta {
+  color: var(--faint);
+  font-size: 0.85rem;
+}
+
+.product-title {
+  margin: 10px 0 0;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 300;
+  line-height: 1.2;
+}
+
+.product-description {
+  margin: 14px 0 0;
+  max-width: 48ch;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.product-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  padding: 13px 26px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: transform var(--move), box-shadow var(--move);
+}
+
+.product-cta .card-cta-arrow {
+  transition: transform var(--move);
+}
+
+@media (hover: hover) {
+  .product-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px -20px rgba(20, 20, 20, 0.45);
+  }
+
+  .product-cta:hover .card-cta-arrow {
+    transform: translateX(-4px);
+  }
 }
 
 /* Small screens */

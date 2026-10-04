@@ -1,19 +1,31 @@
 /**
- * BAZ homepage Worker.
+ * BAZ site Worker.
  *
  * Static files in `public/` (CSS, previews, favicon, robots) are served by
  * Workers Static Assets before this code runs. Anything that is not a static
- * file lands here: `/` is rendered from `src/projects.ts`, `www.` redirects to
- * the apex, everything else is a small 404 page.
+ * file lands here: `/` is the homepage; each project with a `localPath` gets
+ * a small SEO landing page; `/sitemap.xml` is generated from the same project
+ * list; `www.` redirects to the apex; everything else is a small 404 page.
  */
 import { brandMark } from "./brand.ts";
 import { inlinePreviews } from "./previews.ts";
 import { projects } from "./projects.ts";
-import { renderHome, renderMotionCheck, renderNotFound } from "./render.ts";
+import {
+  type AboutVariant,
+  renderDesignReview,
+  renderHome,
+  renderMotionCheck,
+  renderNotFound,
+  renderProjectPage,
+  renderSitemap,
+} from "./render.ts";
 
 const CANONICAL_HOST = "bazy.co.il";
 const CANONICAL_ORIGIN = `https://${CANONICAL_HOST}`;
 const REDIRECT_HOSTS = new Set([`www.${CANONICAL_HOST}`]);
+
+const PROJECT_PAGES = new Map(projects.filter((p) => p.localPath).map((p) => [p.localPath as string, p]));
+const DESIGN_REVIEW_VARIANTS = new Set<AboutVariant>(["a", "b", "c"]);
 
 const SECURITY_HEADERS: Record<string, string> = {
   "content-security-policy":
@@ -69,6 +81,34 @@ export default {
 
     if (url.pathname === "/motion") {
       return htmlResponse(renderMotionCheck(options), request, 200, "no-store");
+    }
+
+    const project = PROJECT_PAGES.get(url.pathname);
+    if (project) {
+      return htmlResponse(renderProjectPage(project, options), request, 200, "public, max-age=300");
+    }
+
+    if (url.pathname === "/sitemap.xml") {
+      return new Response(renderSitemap(projects, options.canonicalUrl), {
+        status: 200,
+        headers: {
+          ...SECURITY_HEADERS,
+          "content-type": "application/xml; charset=utf-8",
+          "cache-control": "public, max-age=3600",
+        },
+      });
+    }
+
+    if (url.pathname.startsWith("/design-review/")) {
+      const variant = url.pathname.slice("/design-review/".length);
+      if (DESIGN_REVIEW_VARIANTS.has(variant as AboutVariant)) {
+        return htmlResponse(
+          renderDesignReview(variant as AboutVariant, projects, options),
+          request,
+          200,
+          "no-store",
+        );
+      }
     }
 
     return htmlResponse(renderNotFound(options), request, 404, "public, max-age=60");

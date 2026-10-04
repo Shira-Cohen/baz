@@ -3,7 +3,15 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { escapeHtml, renderHome, renderMotionCheck, renderNotFound } from "../src/render.ts";
+import {
+  escapeHtml,
+  renderDesignReview,
+  renderHome,
+  renderMotionCheck,
+  renderNotFound,
+  renderProjectPage,
+  renderSitemap,
+} from "../src/render.ts";
 import { projects, type Project } from "../src/projects.ts";
 
 const options = { year: 2026, canonicalUrl: "https://bazy.co.il/" };
@@ -146,4 +154,67 @@ test("404 page links back home", () => {
   const html = renderNotFound(options);
   assert.ok(html.includes("404"));
   assert.ok(html.includes('href="/"'));
+});
+
+test("home page carries one well-formed JSON-LD graph with WebSite, Organization and ItemList", () => {
+  const html = renderHome(projects, options);
+  const match = html.match(/<script type="application\/ld\+json">([^<]*)<\/script>/);
+  assert.ok(match, "expected a JSON-LD script element");
+  const data = JSON.parse(match![1]!.replaceAll("\\u003c", "<"));
+  assert.equal(data["@context"], "https://schema.org");
+  const types = data["@graph"].map((node: { "@type": string }) => node["@type"]);
+  assert.deepEqual(types, ["WebSite", "Organization", "ItemList"]);
+  const itemList = data["@graph"][2];
+  assert.equal(itemList.itemListElement.length, projects.filter((p) => p.localPath).length);
+  assert.equal(itemList.itemListElement[0].url, "https://bazy.co.il/family-calendar");
+});
+
+test("JSON-LD survives a hostile string without breaking out of its <script> tag", () => {
+  const hostile: Project = {
+    id: "x",
+    name: "</script><script>alert(1)</script>",
+    description: "d",
+    category: "C",
+    url: "https://example.com",
+    image: "/previews/x.svg",
+    localPath: "/x",
+  };
+  const html = renderHome([hostile], options);
+  assert.ok(!html.includes("</script><script>alert"), "must not literally close and reopen a script tag");
+});
+
+test("each project with a localPath gets a landing page with its own title, canonical and breadcrumb", () => {
+  for (const project of projects) {
+    if (!project.localPath) continue;
+    const html = renderProjectPage(project, options);
+    assert.ok(html.includes(`<title>${project.name} — BAZ</title>`), `${project.id}: title`);
+    assert.ok(
+      html.includes(`<link rel="canonical" href="https://bazy.co.il${project.localPath}">`),
+      `${project.id}: canonical`,
+    );
+    assert.ok(html.includes(`href="${project.url}"`), `${project.id}: links out to the real app`);
+    assert.ok(html.includes((project.longDescription ?? project.description)), `${project.id}: description`);
+    assert.ok(html.includes('"@type": "BreadcrumbList"') || html.includes('"@type":"BreadcrumbList"'));
+  }
+});
+
+test("sitemap lists the home page and every project localPath, as absolute URLs", () => {
+  const xml = renderSitemap(projects, options.canonicalUrl);
+  assert.ok(xml.startsWith("<?xml"));
+  assert.ok(xml.includes("<loc>https://bazy.co.il/</loc>"));
+  for (const project of projects) {
+    if (project.localPath) {
+      assert.ok(xml.includes(`<loc>https://bazy.co.il${project.localPath}</loc>`), `${project.id} in sitemap`);
+    }
+  }
+});
+
+test("design-review previews show the real hero and grid plus one noindex'd about variant", () => {
+  for (const variant of ["a", "b", "c"] as const) {
+    const html = renderDesignReview(variant, projects, options);
+    assert.ok(html.includes('<meta name="robots" content="noindex">'), `${variant}: noindex`);
+    assert.ok(html.includes('class="hero-title"'), `${variant}: keeps the real hero`);
+    assert.ok(html.includes('id="projects"'), `${variant}: keeps the real project grid`);
+    assert.ok(html.includes(`about-${variant}`), `${variant}: renders its own section`);
+  }
 });

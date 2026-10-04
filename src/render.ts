@@ -1,5 +1,5 @@
 /**
- * Pure HTML rendering for the BAZ homepage. No runtime globals, so it is
+ * Pure HTML rendering for the BAZ site. No runtime globals, so it is
  * unit-testable with plain Node (`npm test`).
  *
  * Every string that reaches the markup goes through `escapeHtml`, including
@@ -27,9 +27,9 @@ export interface RenderOptions {
   brandMark?: string;
 }
 
-/** Wordmark shown in the header and in the footer credit. */
+/** Wordmark shown in the header and wherever "BAZ" appears in running Hebrew text. */
 const SITE_NAME = "BAZ";
-const PAGE_TITLE = "BAZ — דברים קטנים שאנחנו בונים";
+const PAGE_TITLE = "BAZ — לוח שנה משפחתי, תזכורות ומחשבון הוצאות רכב";
 const HERO_TITLE = "דברים קטנים שאנחנו בונים";
 const HERO_INTRO = "כמה דברים ששווה להכיר.";
 const SECTION_TITLE = "מה בנינו";
@@ -38,6 +38,9 @@ const FOOTER_BUILT_BY = "נבנה על ידי";
 const NOT_FOUND_TITLE = "הדף הזה לא קיים.";
 const NOT_FOUND_CTA = "לדף הבית";
 const CARD_SOON = "בקרוב";
+const ABOUT_LABEL = "מה זה BAZ?";
+const ABOUT_TEXT =
+  "BAZ הוא בית לכלים ופרויקטים שאנחנו בונים כדי לפתור דברים מהיום-יום: לוח שנה משפחתי, תזכורות, ומחשבון שעוזר לחשב כמה הרכב באמת עולה. כל כלי עומד בפני עצמו, ונבנה כדי לעשות דבר אחד טוב.";
 /** Self-hosted Heebo (variable weight, OFL) — one file per script, preloaded for the first paint. */
 const FONT_FILES = ["/fonts/heebo-hebrew.woff2", "/fonts/heebo-latin.woff2"];
 const OG_IMAGE_PATH = "/og.png";
@@ -53,6 +56,20 @@ export function escapeHtml(value: string): string {
 
 function twoDigits(n: number): string {
   return String(n).padStart(2, "0");
+}
+
+/** "BAZ" wrapped the way it always is in running Hebrew text: LTR, marked as English for screen readers. */
+function brandSpan(): string {
+  return `<span dir="ltr" lang="en">${SITE_NAME}</span>`;
+}
+
+/**
+ * Renders a JSON-LD script element. `<` is escaped so a string value can
+ * never prematurely close the element (e.g. a stray "</script>" inside a
+ * title) — the data is trusted config today, but this holds regardless.
+ */
+function jsonLdScript(data: unknown): string {
+  return `<script type="application/ld+json">${JSON.stringify(data).replaceAll("<", "\\u003c")}</script>`;
 }
 
 /** Appends the deployment version to a static asset path so caches refresh per deploy. */
@@ -92,6 +109,8 @@ function renderHead(
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="${escapeHtml(PAGE_TITLE)}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(title)}">
+<meta name="twitter:description" content="${escapeHtml(description)}">
 <meta name="theme-color" content="#FAFAF7">${preloads}
 <link rel="icon" href="${escapeHtml(versioned("/favicon.svg", assetVersion))}" type="image/svg+xml">
 <link rel="icon" href="${escapeHtml(versioned("/favicon-32.png", assetVersion))}" type="image/png" sizes="32x32">
@@ -115,7 +134,7 @@ function renderFooter(options: RenderOptions): string {
     : "";
   return `<footer class="site-footer">
 <div class="container footer-inner">
-<span class="footer-credit">${FOOTER_BUILT_BY} <span dir="ltr" lang="en">${SITE_NAME}</span>${mark}</span>
+<span class="footer-credit">${FOOTER_BUILT_BY} ${brandSpan()}${mark}</span>
 <span dir="ltr">© ${String(options.year)}</span>
 </div>
 </footer>`;
@@ -170,20 +189,21 @@ ${body}
 `;
 }
 
-export function renderHome(projects: readonly Project[], options: RenderOptions): string {
-  const names = projects.map((p) => p.name).join(", ");
-  const description = `${SITE_NAME} הוא בית קטן למוצרים דיגיטליים: ${names}.`;
-  const items = projects
-    .map((project, index) => renderProject(project, index, options.inlinePreviews))
-    .join("\n");
-
-  const body = `${renderHeader()}
-<main>
-<section class="hero container">
+/** The hero: unchanged across every round of design work — the one thing kept fixed on purpose. */
+function renderHeroSection(): string {
+  return `<section class="hero container">
 <h1 class="hero-title">${HERO_TITLE}<span class="accent">.</span></h1>
 <p class="hero-intro">${HERO_INTRO}</p>
-</section>
-<section id="projects" class="projects container" aria-labelledby="projects-title">
+</section>`;
+}
+
+/** The project grid, reused by the homepage and by the `/design-review/*` previews so they show it in real context. */
+function renderProjectsSection(
+  projects: readonly Project[],
+  inlinePreviews: Readonly<Record<string, string>> | undefined,
+): string {
+  const items = projects.map((project, index) => renderProject(project, index, inlinePreviews)).join("\n");
+  return `<section id="projects" class="projects container" aria-labelledby="projects-title">
 <div class="section-head">
 <h2 id="projects-title" class="section-title">${SECTION_TITLE}</h2>
 <span class="section-count" dir="ltr"><span class="sr-only">מספר הפרויקטים: </span>${twoDigits(projects.length)}</span>
@@ -191,14 +211,105 @@ export function renderHome(projects: readonly Project[], options: RenderOptions)
 <ul class="project-grid">
 ${items}
 </ul>
-</section>
+</section>`;
+}
+
+export function renderHome(projects: readonly Project[], options: RenderOptions): string {
+  const description =
+    "BAZ הוא בית לכלים ופרויקטים שימושיים למשפחה וליום־יום: לוח שנה משפחתי, תזכורות אישיות, ומחשבון שמחשב כמה הרכב באמת עולה.";
+
+  const jsonLd = jsonLdScript({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        name: SITE_NAME,
+        url: options.canonicalUrl,
+        description,
+        inLanguage: "he-IL",
+      },
+      {
+        "@type": "Organization",
+        name: SITE_NAME,
+        url: options.canonicalUrl,
+        logo: new URL(versioned("/apple-touch-icon.png", undefined), options.canonicalUrl).href,
+      },
+      {
+        "@type": "ItemList",
+        itemListElement: projects
+          .filter((p): p is Project & { localPath: string } => Boolean(p.localPath))
+          .map((p, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: p.name,
+            url: new URL(p.localPath, options.canonicalUrl).href,
+          })),
+      },
+    ],
+  });
+
+  const body = `${renderHeader()}
+<main>
+${renderHeroSection()}
+${renderProjectsSection(projects, options.inlinePreviews)}
 </main>
 ${renderFooter(options)}`;
 
   return renderDocument(
-    renderHead(PAGE_TITLE, description, options.canonicalUrl, options.assetVersion),
+    renderHead(PAGE_TITLE, description, options.canonicalUrl, options.assetVersion, `\n${jsonLd}`),
     body,
   );
+}
+
+/**
+ * A small SEO landing page for one product (e.g. `/family-calendar`), linked
+ * from the homepage's structured data and from `/sitemap.xml`. It explains
+ * the product in BAZ's own words and sends the visitor on to the real app
+ * at `project.url`. Reuses the product's homepage illustration for visual
+ * continuity. See `Project.localPath` in `src/projects.ts`.
+ */
+export function renderProjectPage(project: Project, options: RenderOptions): string {
+  const title = `${project.name} — ${SITE_NAME}`;
+  const description = project.longDescription ?? project.description;
+  const canonical = new URL(project.localPath ?? "/", options.canonicalUrl).href;
+
+  const breadcrumbs = jsonLdScript({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: SITE_NAME, item: new URL("/", options.canonicalUrl).href },
+      { "@type": "ListItem", position: 2, name: project.name, item: canonical },
+    ],
+  });
+
+  const preview = renderPreview(project, 0, options.inlinePreviews);
+
+  const body = `${renderHeader()}
+<main class="container product-page">
+<a class="card-cta product-back" href="/"><span>${NOT_FOUND_CTA}</span><span class="card-cta-arrow" aria-hidden="true">←</span></a>
+<div class="product-head">
+${preview}
+<div class="product-head-text">
+<span class="product-meta" dir="ltr" lang="en">${escapeHtml(project.category)}</span>
+<h1 class="product-title">${escapeHtml(project.name)}</h1>
+<p class="product-description">${escapeHtml(description)}</p>
+<a class="product-cta" href="${escapeHtml(project.url)}"><span>להמשיך ל${escapeHtml(project.name)}</span><span class="card-cta-arrow" aria-hidden="true">←</span></a>
+</div>
+</div>
+</main>
+${renderFooter(options)}`;
+
+  return renderDocument(
+    renderHead(title, description, canonical, options.assetVersion, `\n${breadcrumbs}`),
+    body,
+  );
+}
+
+/** `/sitemap.xml` — the home page plus every project that has a `localPath`, kept in sync automatically. */
+export function renderSitemap(projects: readonly Project[], canonicalUrl: string): string {
+  const paths = ["/", ...projects.filter((p) => p.localPath).map((p) => p.localPath as string)];
+  const urls = paths.map((path) => `<url><loc>${escapeHtml(new URL(path, canonicalUrl).href)}</loc></url>`).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
 
 /**
@@ -234,6 +345,72 @@ ${renderFooter(options)}`;
 
   return renderDocument(
     renderHead(`בדיקת תנועה — ${SITE_NAME}`, "בדיקת תנועה", options.canonicalUrl, options.assetVersion, extra),
+    body,
+  );
+}
+
+export type AboutVariant = "a" | "b" | "c";
+
+/** Variant A: a quiet typographic statement, a direct continuation of the hero's flow — no rules, no box. */
+function renderAboutA(): string {
+  return `<section class="about-a container" aria-labelledby="about-a-title">
+<h2 id="about-a-title" class="about-a-label">${escapeHtml(ABOUT_LABEL)}</h2>
+<p class="about-a-text">${escapeHtml(ABOUT_TEXT)}</p>
+</section>`;
+}
+
+/** Variant B: an asymmetric two-column editorial layout — the question sits in its own narrow column, the answer in the main column. */
+function renderAboutB(): string {
+  return `<section class="about-b container" aria-labelledby="about-b-title">
+<div class="about-b-grid">
+<h2 id="about-b-title" class="about-b-label">מה זה<br>${brandSpan()}?</h2>
+<p class="about-b-text">${escapeHtml(ABOUT_TEXT)}</p>
+</div>
+</section>`;
+}
+
+/** Variant C: echoes the project grid's own header above it — hairline rule, accent square, a small mark — and the paragraph borrows the card body's accent rule. */
+function renderAboutC(brandMark: string | undefined): string {
+  const mark = brandMark ? `<span class="about-c-mark" aria-hidden="true">${brandMark}</span>` : "";
+  return `<section class="about-c container" aria-labelledby="about-c-title">
+<div class="about-c-head">
+<h2 id="about-c-title" class="about-c-label">${escapeHtml(ABOUT_LABEL)}</h2>
+${mark}
+</div>
+<p class="about-c-text">${escapeHtml(ABOUT_TEXT)}</p>
+</section>`;
+}
+
+/**
+ * `/design-review/a|b|c`: the real homepage (hero + project grid, unchanged)
+ * with one candidate "what is BAZ" section appended before the footer, so
+ * each variant is seen in its actual context rather than in isolation. Not
+ * linked from anywhere; noindex; meant to be removed once a variant is chosen.
+ */
+export function renderDesignReview(
+  variant: AboutVariant,
+  projects: readonly Project[],
+  options: RenderOptions,
+): string {
+  const about =
+    variant === "a" ? renderAboutA() : variant === "b" ? renderAboutB() : renderAboutC(options.brandMark);
+
+  const body = `${renderHeader()}
+<main>
+${renderHeroSection()}
+${renderProjectsSection(projects, options.inlinePreviews)}
+${about}
+</main>
+${renderFooter(options)}`;
+
+  return renderDocument(
+    renderHead(
+      `תצוגה: וריאציה ${variant} — ${SITE_NAME}`,
+      "עמוד תצוגה פנימי, לא לאינדקס.",
+      options.canonicalUrl,
+      options.assetVersion,
+      '\n<meta name="robots" content="noindex">',
+    ),
     body,
   );
 }
