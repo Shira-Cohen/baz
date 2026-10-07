@@ -197,6 +197,41 @@ test("each project with a localPath gets a landing page with its own title, cano
   }
 });
 
+test("a project with a screenshot gets it rendered under the product head, sized to avoid layout shift, and used as og:image", () => {
+  // A synthetic fixture, not a real project: whether any current product
+  // actually has a screenshot wired in is a separate, content-dependent
+  // decision (see src/projects.ts) — this test covers the rendering feature.
+  const withShot: Project = {
+    id: "fixture",
+    name: "דוגמה",
+    description: "d",
+    category: "C",
+    url: "https://example.com",
+    image: "/previews/x.svg",
+    localPath: "/x",
+    screenshot: { src: "/screens/fixture.webp", width: 800, height: 600 },
+  };
+  const html = renderProjectPage(withShot, options);
+  const { src, width, height } = withShot.screenshot!;
+  assert.ok(html.includes(`<img src="${src}"`), "screenshot image present");
+  assert.ok(html.includes(`width="${width}" height="${height}"`), "explicit dimensions to avoid layout shift");
+  assert.ok(html.includes('class="product-shot"'));
+  assert.ok(
+    html.includes(`<meta property="og:image" content="https://bazy.co.il${src}">`),
+    "og:image uses the product's own screenshot, not the generic /og.png",
+  );
+  assert.ok(html.includes(`<meta property="og:image:width" content="${width}">`));
+  assert.ok(html.includes(`<meta property="og:image:height" content="${height}">`));
+});
+
+test("a project without a screenshot renders no product-shot figure and falls back to the generic og:image", () => {
+  const noShot = projects.find((p) => p.localPath && !p.screenshot);
+  assert.ok(noShot, "fixture needs at least one localPath project without a screenshot");
+  const html = renderProjectPage(noShot, options);
+  assert.ok(!html.includes('class="product-shot"'));
+  assert.ok(html.includes('<meta property="og:image" content="https://bazy.co.il/og.png">'));
+});
+
 test("sitemap lists the home page and every project localPath, as absolute URLs", () => {
   const xml = renderSitemap(projects, options.canonicalUrl);
   assert.ok(xml.startsWith("<?xml"));

@@ -87,8 +87,11 @@ function renderHead(
   canonicalUrl: string,
   assetVersion: string | undefined,
   extra = "",
+  ogImageOverride?: { src: string; width: number; height: number },
 ): string {
-  const ogImage = new URL(versioned(OG_IMAGE_PATH, assetVersion), canonicalUrl).href;
+  const ogImage = new URL(versioned(ogImageOverride?.src ?? OG_IMAGE_PATH, assetVersion), canonicalUrl).href;
+  const ogWidth = ogImageOverride?.width ?? 1200;
+  const ogHeight = ogImageOverride?.height ?? 630;
   const preloads = FONT_FILES.map(
     (f) => `\n<link rel="preload" href="${escapeHtml(f)}" as="font" type="font/woff2" crossorigin>`,
   ).join("");
@@ -105,9 +108,9 @@ function renderHead(
 <meta property="og:url" content="${escapeHtml(canonicalUrl)}">
 <meta property="og:locale" content="he_IL">
 <meta property="og:image" content="${escapeHtml(ogImage)}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="${escapeHtml(PAGE_TITLE)}">
+<meta property="og:image:width" content="${ogWidth}">
+<meta property="og:image:height" content="${ogHeight}">
+<meta property="og:image:alt" content="${escapeHtml(title)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${escapeHtml(title)}">
 <meta name="twitter:description" content="${escapeHtml(description)}">
@@ -298,6 +301,16 @@ export function renderProjectPage(project: Project, options: RenderOptions): str
 
   const preview = renderPreview(project, 0, options.inlinePreviews);
 
+  // A real screenshot, shown under the illustration — concrete alongside the
+  // abstract, so a visitor sees at a glance what the product actually looks
+  // like. Demo data only (see `Project.screenshot`).
+  const shot = project.screenshot
+    ? `<figure class="product-shot">
+<img src="${escapeHtml(versioned(project.screenshot.src, options.assetVersion))}" width="${project.screenshot.width}" height="${project.screenshot.height}" loading="lazy" decoding="async" alt="צילום מסך של ${escapeHtml(project.name)}">
+<figcaption class="product-shot-caption">כך זה נראה בפועל (נתוני הדמיה להמחשה).</figcaption>
+</figure>`
+    : "";
+
   const body = `${renderHeader()}
 <main class="container product-page">
 <a class="card-cta product-back" href="/"><span>${NOT_FOUND_CTA}</span><span class="card-cta-arrow" aria-hidden="true">←</span></a>
@@ -310,11 +323,12 @@ ${preview}
 <a class="product-cta" href="${escapeHtml(project.url)}"><span>להמשיך ל${escapeHtml(project.name)}</span><span class="card-cta-arrow" aria-hidden="true">←</span></a>
 </div>
 </div>
+${shot}
 </main>
 ${renderFooter(options)}`;
 
   return renderDocument(
-    renderHead(title, description, canonical, options.assetVersion, `\n${breadcrumbs}`),
+    renderHead(title, description, canonical, options.assetVersion, `\n${breadcrumbs}`, project.screenshot),
     body,
   );
 }

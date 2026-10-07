@@ -36,6 +36,14 @@ export interface Project {
    * the product doesn't have one yet.
    */
   localPath?: string;
+  /**
+   * A real screenshot of the product, shown on its landing page under the
+   * illustration — concrete alongside the abstract. Width/height are the
+   * image's actual pixel dimensions (avoids layout shift); also used as the
+   * page's og:image for link previews. Demo data only — never a screenshot
+   * containing a real user's personal data.
+   */
+  screenshot?: { src: string; width: number; height: number };
 }
 
 export const projects: Project[] = [
@@ -49,6 +57,10 @@ export const projects: Project[] = [
     url: "https://family.bazy.co.il",
     image: "/previews/family-calendar.svg",
     localPath: "/family-calendar",
+    // Not wired in yet: the uploaded screenshot (public/screens/family-calendar.webp)
+    // is being served back as a "blocked by AI" placeholder — see conversation
+    // with the user. Re-add `screenshot: { src: "/screens/family-calendar.webp",
+    // width: 1100, height: 784 }` once a working replacement image is ready.
   },
   {
     id: "family-reminders",

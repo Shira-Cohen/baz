@@ -813,6 +813,27 @@ a:focus-visible {
   }
 }
 
+/* A real screenshot under the product head: concrete alongside the abstract
+   illustration above it. */
+.product-shot {
+  margin: clamp(40px, 8vh, 72px) 0 0;
+}
+
+.product-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.product-shot-caption {
+  margin-top: 12px;
+  color: var(--faint);
+  font-size: 0.85rem;
+}
+
 /* Small screens */
 @media (max-width: 639px) {
   .header-inner {
